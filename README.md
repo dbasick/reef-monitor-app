@@ -384,10 +384,10 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
 
 ## 📞 Contact
 
-**Project Maintainer:** [Your Name]
-- Email: your.email@example.com
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Project: [https://github.com/yourusername/reef-monitor](https://github.com/yourusername/reef-monitor)
+**Project Maintainer:** Daniel Basick
+- Email: DaBasick@yahoo.com
+- GitHub: [@dbasick](https://github.com/dbasick)
+- Project: [https://github.com/dbasick/reef-monitor-app](https://github.com/dbasick/reef-monitor-app)
 
 ---
 
