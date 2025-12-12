@@ -64,7 +64,7 @@ function App() {
     try {
       setLoading(true);
       setError(null); // Clear any previous errors
-      const session = await ort.InferenceSession.create('/coral_model.onnx', {
+      const session = await ort.InferenceSession.create(process.env.PUBLIC_URL + '/coral_model.onnx', {
         executionProviders: ['wasm'],
       });
       setModel(session);
