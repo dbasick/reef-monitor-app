@@ -63,6 +63,7 @@ function App() {
   const loadModel = async () => {
     try {
       setLoading(true);
+      setError(null); // Clear any previous errors
       const session = await ort.InferenceSession.create('/coral_model.onnx', {
         executionProviders: ['wasm'],
       });
@@ -119,13 +120,21 @@ function App() {
   };
 
   const analyzeImage = async (imageUrl, imageFile) => {
+    // FIX #1: Check if model is loaded but don't show error yet - just wait
     if (!model) {
-      setError('Model not loaded yet. Please wait.');
-      return;
+      if (loading) {
+        // Model is still loading, wait a bit and retry
+        setTimeout(() => analyzeImage(imageUrl, imageFile), 500);
+        return;
+      } else {
+        // Model failed to load
+        setError('Model failed to load. Please refresh the page.');
+        return;
+      }
     }
 
     setAnalyzing(true);
-    setError(null);
+    setError(null); // Clear any previous errors
     setCurrentImageFile(imageFile); // Store for later upload
 
     try {
@@ -170,13 +179,13 @@ function App() {
       };
       
       setResult(resultData);
-      // Don't save to history yet - wait for location info
-      setShowLocationModal(true); // Show location picker
+      setAnalyzing(false);
+      // FIX #2: Show location modal immediately after setting result
+      setShowLocationModal(true);
       
     } catch (err) {
       console.error('Analysis error:', err);
       setError('Failed to analyze image. Please try again.');
-    } finally {
       setAnalyzing(false);
     }
   };
@@ -244,179 +253,157 @@ function App() {
             setSaving(false);
             return;
           }
-          const site = USVI_DIVE_SITES.find(s => s.id === selectedSite);
-          locationData = {
-            siteId: site.id,
-            siteName: site.name,
-            island: site.island
-          };
+          const site = USVI_DIVE_SITES.find(s => s.name === selectedSite);
+          if (site) {
+            locationData = {
+              siteName: site.name,
+              island: site.island,
+              coordinates: site.coordinates
+            };
+          }
           break;
           
         case LOCATION_TYPES.CUSTOM_SITE:
           if (!customSiteName.trim()) {
-            alert('Please enter a name for this dive site');
+            alert('Please enter a site name');
             setSaving(false);
             return;
           }
           locationData = {
-            customSiteName: customSiteName.trim(),
+            siteName: customSiteName,
             island: customSiteIsland,
-            description: customSiteDescription.trim() || null
+            description: customSiteDescription
           };
-          // Optionally add GPS to custom site
           if (useGPS) {
             const coords = await getCurrentGPSLocation();
             if (coords) {
               locationData.coordinates = { lat: coords.lat, lng: coords.lng };
+              locationData.accuracy = coords.accuracy;
             }
           }
           break;
           
-        case LOCATION_TYPES.GENERAL:
+        case LOCATION_TYPES.GENERAL_AREA:
           if (!selectedArea) {
-            alert('Please select a general area');
+            alert('Please select an area');
             setSaving(false);
             return;
           }
-          const area = GENERAL_AREAS.find(a => a.id === selectedArea);
-          locationData = {
-            areaId: area.id,
-            areaName: area.name
-          };
+          const area = GENERAL_AREAS.find(a => a.name === selectedArea);
+          if (area) {
+            locationData = {
+              generalArea: area.name,
+              approximateCoordinates: area.approximateCenter
+            };
+          }
           break;
       }
-
-      // Convert image URL to blob for upload
-      let imageBlob = currentImageFile;
-      if (!imageBlob && result.imageUrl) {
-        // If we don't have the original file, convert data URL to blob
-        const response = await fetch(result.imageUrl);
-        imageBlob = await response.blob();
-      }
-
-      // Save to cloud
-      const cloudResult = await saveObservation({
-        imageFile: imageBlob,
+      
+      // Prepare observation data
+      const observationData = {
         prediction: result.prediction,
         confidence: parseFloat(result.confidence),
+        allPredictions: result.allPredictions,
+        timestamp: new Date().toISOString(),
         locationType: locationType,
-        locationData: locationData,
-        notes: notes,
-        isSensitive: isSensitive
-      });
-
-      if (cloudResult.success) {
-        // Save to local history with cloud ID
-        saveToHistory(result, cloudResult.id);
-        
-        setShowLocationModal(false);
-        setNotes('');
-        setCustomSiteName('');
-        setCustomSiteDescription('');
-        setIsSensitive(false);
-        
-        alert('✅ Observation saved to cloud database!');
-      } else {
-        // Save locally even if cloud fails
-        saveToHistory(result, null);
-        alert('⚠️ Saved locally. Cloud sync failed but data is safe on your device.');
-      }
+        location: locationData,
+        isSensitive: isSensitive,
+        notes: notes.trim()
+      };
       
-    } catch (error) {
-      console.error('Save error:', error);
+      // Save to Firebase and get cloud ID
+      const cloudId = await saveObservation(observationData, currentImageFile);
+      
+      // Save to local history with cloud ID
+      saveToHistory(result, cloudId);
+      
+      // Reset states
+      setShowLocationModal(false);
+      setCurrentImageFile(null);
+      setNotes('');
+      setCustomSiteName('');
+      setCustomSiteDescription('');
+      setSelectedSite(null);
+      setSelectedArea(null);
+      
+      alert('Observation saved successfully! 🪸');
+      
+    } catch (err) {
+      console.error('Error saving observation:', err);
+      alert('Failed to save to cloud, but saved locally. Check your connection.');
+      // Still save locally even if cloud fails
       saveToHistory(result, null);
-      alert('Saved locally. Will sync when connection improves.');
+      setShowLocationModal(false);
     } finally {
       setSaving(false);
     }
   };
 
   const handleCancelLocation = () => {
-    // Save locally without cloud sync
-    saveToHistory(result, null);
+    // Just close modal without saving
     setShowLocationModal(false);
-    setNotes('');
-    setCustomSiteName('');
-    setCustomSiteDescription('');
-    setIsSensitive(false);
+    setCurrentImageFile(null);
+    // Keep the result visible but without location data
   };
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        setIsCameraActive(true);
       }
+      setIsCameraActive(true);
     } catch (err) {
       console.error('Camera error:', err);
-      setError('Unable to access camera. Please check permissions.');
-    }
-  };
-
-  const capturePhoto = () => {
-    if (videoRef.current) {
-      const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(videoRef.current, 0, 0);
-      
-      canvas.toBlob((blob) => {
-        const imageUrl = URL.createObjectURL(blob);
-        stopCamera();
-        analyzeImage(imageUrl, blob);
-      }, 'image/jpeg');
+      setError('Could not access camera. Using file picker instead.');
+      cameraInputRef.current?.click();
     }
   };
 
   const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-      setIsCameraActive(false);
+    if (videoRef.current?.srcObject) {
+      const tracks = videoRef.current.srcObject.getTracks();
+      tracks.forEach(track => track.stop());
     }
+    setIsCameraActive(false);
+  };
+
+  const capturePhoto = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(videoRef.current, 0, 0);
+    
+    canvas.toBlob((blob) => {
+      const file = new File([blob], `coral-${Date.now()}.jpg`, { type: 'image/jpeg' });
+      const imageUrl = URL.createObjectURL(blob);
+      stopCamera();
+      analyzeImage(imageUrl, file);
+    }, 'image/jpeg', 0.95);
   };
 
   const getHealthColor = (prediction) => {
-    switch (prediction) {
-      case 'Healthy Coral': return '#00d4aa';
-      case 'Bleached Coral': return '#ffa726';
-      default: return '#64b5f6';
-    }
+    if (prediction.includes('Healthy')) return 'var(--coral-healthy)';
+    if (prediction.includes('Bleached')) return 'var(--coral-warn)';
+    if (prediction.includes('Dead')) return 'var(--coral-danger)';
+    return 'var(--coral-disease)';
   };
 
   const getHealthIcon = (prediction) => {
-    switch (prediction) {
-      case 'Healthy Coral': return '🪸';
-      case 'Bleached Coral': return '⚠️';
-      default: return '🔍';
-    }
+    if (prediction.includes('Healthy')) return '🪸';
+    if (prediction.includes('Bleached')) return '⚠️';
+    if (prediction.includes('Dead')) return '💀';
+    return '🦠';
   };
 
-  if (loading) {
-    return (
-      <div className="app">
-        <div className="loading-screen">
-          <div className="coral-loader">
-            <div className="coral-anim">🪸</div>
-          </div>
-          <h2>Loading AI Model...</h2>
-          <p>Initializing reef health analysis</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="app">
+    <div className="App">
       {/* Header */}
       <header className="header">
-        <div className="header-content">
-          <h1>🪸 Reef Monitor</h1>
-          <p>AI-Powered Coral Health Analysis</p>
-        </div>
+        <h1>🪸 Reef Monitor</h1>
         <button 
           className="history-btn"
           onClick={() => setShowHistory(!showHistory)}
@@ -425,8 +412,18 @@ function App() {
         </button>
       </header>
 
-      {/* Location Modal */}
-      {showLocationModal && result && (
+      {/* Loading State - FIX #3: Only show if loading and no error */}
+      {loading && !error && (
+        <div className="loading-screen">
+          <Loader className="spinner" size={64} />
+          <h2>Loading AI Model...</h2>
+          <p>Downloading coral health classifier (~77MB)</p>
+          <p className="loading-tip">This only happens once!</p>
+        </div>
+      )}
+
+      {/* Location Picker Modal */}
+      {showLocationModal && (
         <LocationPicker
           locationType={locationType}
           setLocationType={setLocationType}
@@ -514,7 +511,7 @@ function App() {
       {!isCameraActive && !showHistory && (
         <main className="main">
           {/* Action Buttons */}
-          {!result && (
+          {!result && !loading && (
             <div className="action-section">
               <button 
                 className="action-btn primary"
@@ -560,8 +557,8 @@ function App() {
             </div>
           )}
 
-          {/* Error State */}
-          {error && !result && (
+          {/* Error State - FIX #4: Only show error if no result and not analyzing */}
+          {error && !result && !analyzing && (
             <div className="error-banner">
               <Info size={20} />
               <span>{error}</span>
@@ -626,7 +623,7 @@ function App() {
           )}
 
           {/* Info Card */}
-          {!result && !analyzing && (
+          {!result && !analyzing && !loading && (
             <div className="info-card">
               <h3>How It Works</h3>
               <ol>
