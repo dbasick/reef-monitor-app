@@ -64,7 +64,7 @@ function App() {
     try {
       setLoading(true);
       setError(null); // Clear any previous errors
-      const session = await ort.InferenceSession.create(process.env.PUBLIC_URL + '/coral_model.onnx', {
+      const session = await ort.InferenceSession.create('/coral_model.onnx', {
         executionProviders: ['wasm'],
       });
       setModel(session);
@@ -77,104 +77,23 @@ function App() {
   };
 
   const loadHistory = () => {
-    try {
-      const saved = localStorage.getItem('reefMonitorHistory');
-      if (saved) {
-        console.log('📂 Loading history from localStorage...');
-        const parsed = JSON.parse(saved);
-        
-        if (Array.isArray(parsed)) {
-          console.log(`✅ Loaded ${parsed.length} history entries`);
-          
-          // Debug first entry to see image URL type
-          if (parsed.length > 0) {
-            const firstEntry = parsed[0];
-            console.log('First entry check:', {
-              hasImageUrl: !!firstEntry.imageUrl,
-              imageUrlType: firstEntry.imageUrl?.substring(0, 30) + '...',
-              isBase64: firstEntry.imageUrl?.startsWith('data:image'),
-              isBlob: firstEntry.imageUrl?.startsWith('blob:'),
-              timestamp: firstEntry.timestamp
-            });
-          }
-          
-          setHistory(parsed);
-        } else {
-          console.warn('⚠️ History data was not an array, resetting');
-          localStorage.removeItem('reefMonitorHistory');
-        }
-      } else {
-        console.log('📭 No history found in localStorage');
-      }
-    } catch (error) {
-      console.error('❌ Error loading history from localStorage:', error);
-      // Clear corrupted data
-      localStorage.removeItem('reefMonitorHistory');
-    }
-  };
-
-  const deleteHistoryEntry = (entryId) => {
-    try {
-      const updatedHistory = history.filter(item => item.id !== entryId);
-      setHistory(updatedHistory);
-      localStorage.setItem('reefMonitorHistory', JSON.stringify(updatedHistory));
-      console.log(`🗑️ Deleted entry ${entryId}. ${updatedHistory.length} entries remaining.`);
-    } catch (error) {
-      console.error('❌ Error deleting history entry:', error);
+    const saved = localStorage.getItem('reefMonitorHistory');
+    if (saved) {
+      setHistory(JSON.parse(saved));
     }
   };
 
   const saveToHistory = (result, cloudId = null) => {
-    try {
-      const newEntry = {
-        ...result,
-        timestamp: new Date().toISOString(),
-        id: Date.now(),
-        cloudId: cloudId,
-        synced: cloudId ? true : false
-      };
-      
-      // Debug logging - check what we're saving
-      console.log('📝 Saving to history:', {
-        imageUrlType: newEntry.imageUrl?.substring(0, 30) + '...',
-        imageUrlLength: newEntry.imageUrl?.length,
-        isBase64: newEntry.imageUrl?.startsWith('data:image'),
-        isBlob: newEntry.imageUrl?.startsWith('blob:'),
-        prediction: newEntry.prediction,
-        historyCount: history.length
-      });
-      
-      const newHistory = [newEntry, ...history].slice(0, 50);
-      setHistory(newHistory);
-      
-      // Calculate size before saving
-      const historyJson = JSON.stringify(newHistory);
-      const sizeMB = (historyJson.length / 1024 / 1024).toFixed(2);
-      console.log(`💾 History size: ${sizeMB} MB (${newHistory.length} entries)`);
-      
-      localStorage.setItem('reefMonitorHistory', historyJson);
-      console.log('✅ Successfully saved to localStorage');
-      
-    } catch (error) {
-      console.error('❌ Error saving to history:', error);
-      console.error('Error type:', error.name);
-      
-      // If quota exceeded, try removing oldest entries
-      if (error.name === 'QuotaExceededError') {
-        console.warn('⚠️ Storage quota exceeded! Attempting to reduce...');
-        alert('Storage limit reached. Reducing history to save space.');
-        try {
-          // Keep only last 10 entries to free up space
-          const reducedHistory = history.slice(0, 10);
-          setHistory(reducedHistory);
-          localStorage.setItem('reefMonitorHistory', JSON.stringify(reducedHistory));
-          console.log('✅ Reduced history to 10 entries');
-        } catch (e) {
-          console.error('❌ Could not save even reduced history:', e);
-          alert('Storage completely full. Please manually clear history.');
-        }
-      }
-    }
+    const newEntry = {
+      ...result,
+      timestamp: new Date().toISOString(),
+      id: Date.now(),
+      cloudId: cloudId,
+      synced: cloudId ? true : false
+    };
+    const newHistory = [newEntry, ...history].slice(0, 50);
+    setHistory(newHistory);
+    localStorage.setItem('reefMonitorHistory', JSON.stringify(newHistory));
   };
 
   const preprocessImage = (imageElement) => {
@@ -421,11 +340,7 @@ function App() {
   };
 
   const handleCancelLocation = () => {
-    // Save to local history even without location data
-    // This allows users to keep their analysis results
-    saveToHistory(result, null);
-    
-    // Close modal and clean up
+    // Just close modal without saving
     setShowLocationModal(false);
     setCurrentImageFile(null);
     // Keep the result visible but without location data
@@ -752,17 +667,6 @@ function App() {
                     className="history-indicator"
                     style={{ backgroundColor: getHealthColor(item.prediction) }}
                   />
-                  <button 
-                    className="btn-delete-item"
-                    onClick={() => {
-                      if (window.confirm('Delete this entry?')) {
-                        deleteHistoryEntry(item.id);
-                      }
-                    }}
-                    aria-label="Delete entry"
-                  >
-                    🗑️
-                  </button>
                 </div>
               ))}
             </div>
