@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Upload, History, Info, ChevronRight, Loader } from 'lucide-react';
+import { Camera, Upload, History, Info, ChevronRight, Loader, Trash2 } from 'lucide-react';
 import * as ort from 'onnxruntime-web';
 import './App.css';
 import LocationPicker from './components/LocationPicker';
@@ -64,7 +64,7 @@ function App() {
     try {
       setLoading(true);
       setError(null); // Clear any previous errors
-      const session = await ort.InferenceSession.create('/coral_model.onnx', {
+      const session = await ort.InferenceSession.create(process.env.PUBLIC_URL + '/coral_model.onnx', {
         executionProviders: ['wasm'],
       });
       setModel(session);
@@ -92,6 +92,12 @@ function App() {
       synced: cloudId ? true : false
     };
     const newHistory = [newEntry, ...history].slice(0, 50);
+    setHistory(newHistory);
+    localStorage.setItem('reefMonitorHistory', JSON.stringify(newHistory));
+  };
+
+  const deleteFromHistory = (id) => {
+    const newHistory = history.filter(item => item.id !== id);
     setHistory(newHistory);
     localStorage.setItem('reefMonitorHistory', JSON.stringify(newHistory));
   };
@@ -667,6 +673,13 @@ function App() {
                     className="history-indicator"
                     style={{ backgroundColor: getHealthColor(item.prediction) }}
                   />
+                  <button 
+                    className="btn-delete-item"
+                    onClick={() => deleteFromHistory(item.id)}
+                    aria-label="Delete scan"
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </div>
               ))}
             </div>
