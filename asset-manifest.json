@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/reef-monitor-app/static/css/main.c8342609.css",
-    "main.js": "/reef-monitor-app/static/js/main.8a76d573.js",
+    "main.css": "/reef-monitor-app/static/css/main.a7192972.css",
+    "main.js": "/reef-monitor-app/static/js/main.b8e8baf5.js",
     "static/media/ort-wasm-simd-threaded.jsep.wasm": "/reef-monitor-app/static/media/ort-wasm-simd-threaded.jsep.9b38a8c18d5f4d131491.wasm",
     "static/media/ort.bundle.min.mjs": "/reef-monitor-app/static/media/ort.bundle.min.fdf769c7752a5def7ed2.mjs",
     "index.html": "/reef-monitor-app/index.html",
-    "main.c8342609.css.map": "/reef-monitor-app/static/css/main.c8342609.css.map",
-    "main.8a76d573.js.map": "/reef-monitor-app/static/js/main.8a76d573.js.map"
+    "main.a7192972.css.map": "/reef-monitor-app/static/css/main.a7192972.css.map",
+    "main.b8e8baf5.js.map": "/reef-monitor-app/static/js/main.b8e8baf5.js.map"
   },
   "entrypoints": [
-    "static/css/main.c8342609.css",
-    "static/js/main.8a76d573.js"
+    "static/css/main.a7192972.css",
+    "static/js/main.b8e8baf5.js"
   ]
 }
