@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Upload, History, Info, ChevronRight, Loader, Trash2 } from 'lucide-react';
+import { Camera, Upload, History, Info, ChevronRight, Loader, Trash2, Map } from 'lucide-react';
 import * as ort from 'onnxruntime-web';
 import './App.css';
 import LocationPicker from './components/LocationPicker';
+import MapView from './components/MapView';
 import { 
   saveObservation, 
   LOCATION_TYPES, 
@@ -20,6 +21,7 @@ function App() {
   const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [showMap, setShowMap] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
@@ -40,12 +42,14 @@ function App() {
   const [saving, setSaving] = useState(false);
   const [currentImageFile, setCurrentImageFile] = useState(null);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Load model on component mount
   useEffect(() => {
     loadModel();
     loadHistory();
     checkFirstTime();
+    checkIfMobile();
   }, []);
 
   const checkFirstTime = () => {
@@ -53,6 +57,11 @@ function App() {
     if (!hasSeenWelcome) {
       setShowWelcome(true);
     }
+  };
+
+  const checkIfMobile = () => {
+    const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    setIsMobile(mobile);
   };
 
   const dismissWelcome = () => {
@@ -199,15 +208,32 @@ function App() {
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
+      // Clear any previous errors
+      setError(null);
+      
+      // Ensure file has proper metadata for Firebase upload
+      // If it's from camera capture, it might not have a proper name
+      let properFile = file;
+      if (!file.name || file.name === 'image.jpg' || file.name === 'blob') {
+        properFile = new File(
+          [file],
+          `coral-${Date.now()}.jpg`,
+          { type: file.type || 'image/jpeg' }
+        );
+      }
+      
       const reader = new FileReader();
       reader.onload = (e) => {
-        analyzeImage(e.target.result, file);
+        analyzeImage(e.target.result, properFile);
       };
       reader.onerror = () => {
         setError('Failed to read image file.');
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(properFile);
     }
+    
+    // Reset the input so same file can be selected again
+    event.target.value = '';
   };
 
   // Helper to get GPS coordinates
@@ -254,18 +280,28 @@ function App() {
           break;
           
         case LOCATION_TYPES.DIVE_SITE:
+          console.log('🔍 DIVE_SITE case triggered');
+          console.log('🔍 selectedSite value:', selectedSite);
+          
           if (!selectedSite) {
             alert('Please select a dive site');
             setSaving(false);
             return;
           }
-          const site = USVI_DIVE_SITES.find(s => s.name === selectedSite);
+          
+          // FIX: Search by ID, not name (selectedSite contains the ID)
+          const site = USVI_DIVE_SITES.find(s => s.id === selectedSite);
+          console.log('🔍 Found site object:', site);
+          
           if (site) {
             locationData = {
+              siteId: site.id,
               siteName: site.name,
-              island: site.island,
-              coordinates: site.coordinates
+              island: site.island
             };
+            console.log('✅ locationData built:', locationData);
+          } else {
+            console.error('❌ Site not found in USVI_DIVE_SITES!');
           }
           break;
           
@@ -307,18 +343,20 @@ function App() {
       
       // Prepare observation data
       const observationData = {
+        imageFile: currentImageFile,  // ADD THIS LINE
         prediction: result.prediction,
         confidence: parseFloat(result.confidence),
         allPredictions: result.allPredictions,
         timestamp: new Date().toISOString(),
         locationType: locationType,
-        location: locationData,
+        locationData: locationData,  // CHANGED from location to locationData
         isSensitive: isSensitive,
         notes: notes.trim()
       };
       
       // Save to Firebase and get cloud ID
-      const cloudId = await saveObservation(observationData, currentImageFile);
+      const saveResult = await saveObservation(observationData);
+      const cloudId = saveResult?.id || null;
       
       // Save to local history with cloud ID
       saveToHistory(result, cloudId);
@@ -352,45 +390,6 @@ function App() {
     // Keep the result visible but without location data
   };
 
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' }
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-      setIsCameraActive(true);
-    } catch (err) {
-      console.error('Camera error:', err);
-      setError('Could not access camera. Using file picker instead.');
-      cameraInputRef.current?.click();
-    }
-  };
-
-  const stopCamera = () => {
-    if (videoRef.current?.srcObject) {
-      const tracks = videoRef.current.srcObject.getTracks();
-      tracks.forEach(track => track.stop());
-    }
-    setIsCameraActive(false);
-  };
-
-  const capturePhoto = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(videoRef.current, 0, 0);
-    
-    canvas.toBlob((blob) => {
-      const file = new File([blob], `coral-${Date.now()}.jpg`, { type: 'image/jpeg' });
-      const imageUrl = URL.createObjectURL(blob);
-      stopCamera();
-      analyzeImage(imageUrl, file);
-    }, 'image/jpeg', 0.95);
-  };
-
   const getHealthColor = (prediction) => {
     if (prediction.includes('Healthy')) return 'var(--coral-healthy)';
     if (prediction.includes('Bleached')) return 'var(--coral-warn)';
@@ -410,12 +409,22 @@ function App() {
       {/* Header */}
       <header className="header">
         <h1>🪸 Reef Monitor</h1>
-        <button 
-          className="history-btn"
-          onClick={() => setShowHistory(!showHistory)}
-        >
-          <History size={24} />
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button 
+            className="history-btn"
+            onClick={() => setShowHistory(!showHistory)}
+            title="View History"
+          >
+            <History size={24} />
+          </button>
+          <button 
+            className="history-btn"
+            onClick={() => setShowMap(true)}
+            title="View Map"
+          >
+            <Map size={24} />
+          </button>
+        </div>
       </header>
 
       {/* Loading State - FIX #3: Only show if loading and no error */}
@@ -496,39 +505,26 @@ function App() {
         </div>
       )}
 
-      {/* Camera View */}
-      {isCameraActive && (
-        <div className="camera-container">
-          <video ref={videoRef} autoPlay playsInline className="camera-preview" />
-          <div className="camera-controls">
-            <button className="btn-secondary" onClick={stopCamera}>
-              Cancel
-            </button>
-            <button className="btn-capture" onClick={capturePhoto}>
-              <div className="capture-ring">
-                <div className="capture-dot" />
-              </div>
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Main Content */}
-      {!isCameraActive && !showHistory && (
+      {!showHistory && !showMap && (
         <main className="main">
           {/* Action Buttons */}
           {!result && !loading && (
             <div className="action-section">
-              <button 
-                className="action-btn primary"
-                onClick={() => cameraInputRef.current?.click()}
-              >
-                <Camera size={32} />
-                <span>Take Photo</span>
-              </button>
+              {/* Show "Take Photo" only on mobile */}
+              {isMobile && (
+                <button 
+                  className="action-btn primary"
+                  onClick={() => cameraInputRef.current?.click()}
+                >
+                  <Camera size={32} />
+                  <span>Take Photo</span>
+                </button>
+              )}
               
+              {/* Show "Upload Image" always, but make it primary on desktop */}
               <button 
-                className="action-btn secondary"
+                className={`action-btn ${isMobile ? 'secondary' : 'primary'}`}
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Upload size={32} />
@@ -685,6 +681,11 @@ function App() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Map View */}
+      {showMap && (
+        <MapView onBack={() => setShowMap(false)} />
       )}
 
       {/* Footer */}

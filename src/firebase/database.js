@@ -9,6 +9,7 @@ import {
   Timestamp 
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { signInAnonymously } from 'firebase/auth';
 import imageCompression from 'browser-image-compression';
 import { db, storage, auth } from './config';
 
@@ -23,19 +24,105 @@ export const LOCATION_TYPES = {
 };
 
 /**
- * Popular USVI dive sites
+ * Popular USVI dive sites with GPS coordinates
  */
 export const USVI_DIVE_SITES = [
-  { id: 'coki_beach', name: 'Coki Beach', island: 'St. Thomas' },
-  { id: 'cow_and_calf', name: 'Cow and Calf Rocks', island: 'St. Thomas' },
-  { id: 'wreck_alley', name: 'Wreck Alley', island: 'St. Thomas' },
-  { id: 'french_cap', name: 'French Cap', island: 'St. Thomas' },
-  { id: 'hull_bay', name: 'Hull Bay', island: 'St. Thomas' },
-  { id: 'frederiksted_pier', name: 'Frederiksted Pier', island: 'St. Croix' },
-  { id: 'salt_river', name: 'Salt River Canyon', island: 'St. Croix' },
-  { id: 'cane_bay', name: 'Cane Bay Wall', island: 'St. Croix' },
-  { id: 'trunk_bay', name: 'Trunk Bay', island: 'St. John' },
-  { id: 'haulover_bay', name: 'Haulover Bay', island: 'St. John' },
+  // ST. THOMAS
+  { 
+    id: 'coki_beach', 
+    name: 'Coki Beach', 
+    island: 'St. Thomas',
+    lat: 18.35167,
+    lng: -64.86583
+  },
+  { 
+    id: 'cow_and_calf', 
+    name: 'Cow and Calf Rocks', 
+    island: 'St. Thomas',
+    lat: 18.30430,
+    lng: -64.84662
+  },
+  { 
+    id: 'wreck_alley', 
+    name: 'Wreck Alley', 
+    island: 'St. Thomas',
+    lat: 18.31000,
+    lng: -64.95000
+  },
+  { 
+    id: 'french_cap', 
+    name: 'French Cap', 
+    island: 'St. Thomas',
+    lat: 18.2330,
+    lng: -64.8529
+  },
+  { 
+    id: 'hull_bay', 
+    name: 'Hull Bay', 
+    island: 'St. Thomas',
+    lat: 18.37087,
+    lng: -64.95269
+  },
+  { 
+    id: 'lovango_south', 
+    name: 'Lovango (South)', 
+    island: 'St. Thomas',
+    lat: 18.3603,
+    lng: -64.8045
+  },
+  { 
+    id: 'lovango_north', 
+    name: 'Lovango (North)', 
+    island: 'St. Thomas',
+    lat: 18.3648,
+    lng: -64.8031
+  },
+  
+  // ST. CROIX
+  { 
+    id: 'frederiksted_pier', 
+    name: 'Frederiksted Pier', 
+    island: 'St. Croix',
+    lat: 17.71380,
+    lng: -64.88931
+  },
+  { 
+    id: 'salt_river', 
+    name: 'Salt River Canyon', 
+    island: 'St. Croix',
+    lat: 17.78470,
+    lng: -64.75637
+  },
+  { 
+    id: 'cane_bay', 
+    name: 'Cane Bay Wall', 
+    island: 'St. Croix',
+    lat: 17.77422,
+    lng: -64.81373
+  },
+  
+  // ST. JOHN
+  { 
+    id: 'trunk_bay', 
+    name: 'Trunk Bay', 
+    island: 'St. John',
+    lat: 18.35426,
+    lng: -64.76942
+  },
+  { 
+    id: 'haulover_bay', 
+    name: 'Haulover Bay', 
+    island: 'St. John',
+    lat: 18.34885,
+    lng: -64.67806
+  },
+  { 
+    id: 'annaberg', 
+    name: 'Annaberg', 
+    island: 'St. John',
+    lat: 18.36421,
+    lng: -64.72506
+  },
 ];
 
 /**
@@ -54,9 +141,34 @@ export const GENERAL_AREAS = [
 ];
 
 /**
+ * Ensure user is authenticated (anonymously if needed)
+ * This is required for Firebase Storage uploads
+ */
+async function ensureAuth() {
+  if (!auth.currentUser) {
+    try {
+      console.log('🔐 No user signed in, signing in anonymously...');
+      await signInAnonymously(auth);
+      console.log('✅ Anonymous sign-in successful:', auth.currentUser.uid);
+    } catch (error) {
+      console.error('❌ Anonymous sign-in failed:', error);
+      throw new Error('Authentication required for uploads');
+    }
+  } else {
+    console.log('✅ User already authenticated:', auth.currentUser.uid);
+  }
+}
+
+/**
  * Compress image before upload
  */
 async function compressImage(file) {
+  // Validate that we have a proper File/Blob
+  if (!file || !(file instanceof Blob || file instanceof File)) {
+    console.error('Invalid file type passed to compressImage:', typeof file);
+    throw new Error('Invalid image file');
+  }
+
   const options = {
     maxSizeMB: 1,
     maxWidthOrHeight: 1920,
@@ -65,9 +177,13 @@ async function compressImage(file) {
   };
   
   try {
-    return await imageCompression(file, options);
+    console.log('🗜️ Compressing image:', file.name, file.size, 'bytes');
+    const compressed = await imageCompression(file, options);
+    console.log('✅ Compressed to:', compressed.size, 'bytes');
+    return compressed;
   } catch (error) {
-    console.error('Image compression failed:', error);
+    console.error('❌ Image compression failed:', error);
+    // Return original file if compression fails
     return file;
   }
 }
@@ -103,7 +219,11 @@ function getCurrentLocation() {
  * Save coral observation to cloud database
  */
 export async function saveObservation(data) {
+  console.log('🔍 saveObservation called with full data:', JSON.stringify(data, null, 2));
   try {
+    // CRITICAL: Ensure user is authenticated before any Firebase operations
+    await ensureAuth();
+    
     const {
       imageFile,
       prediction,
@@ -115,6 +235,11 @@ export async function saveObservation(data) {
       waterTemp,
       depth
     } = data;
+
+    console.log('📦 Extracted values:');
+    console.log('  - imageFile:', imageFile ? 'exists' : 'MISSING');
+    console.log('  - locationType:', locationType);
+    console.log('  - locationData:', JSON.stringify(locationData, null, 2));
 
     // 1. Compress and upload image
     const compressedImage = await compressImage(imageFile);
@@ -147,11 +272,15 @@ export async function saveObservation(data) {
         break;
         
       case LOCATION_TYPES.DIVE_SITE:
+        // Find the selected dive site to get its coordinates
+        const selectedSite = USVI_DIVE_SITES.find(s => s.id === locationData.siteId);
         location = {
           ...location,
           siteId: locationData.siteId,
           siteName: locationData.siteName,
-          island: locationData.island
+          island: locationData.island,
+          // Automatically add coordinates if site is pre-populated
+          coordinates: selectedSite ? { lat: selectedSite.lat, lng: selectedSite.lng } : null
         };
         break;
         
