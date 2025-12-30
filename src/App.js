@@ -4,6 +4,7 @@ import * as ort from 'onnxruntime-web';
 import './App.css';
 import LocationPicker from './components/LocationPicker';
 import MapView from './components/MapView';
+import CoralGuide from './components/CoralGuide';
 import { 
   saveObservation, 
   LOCATION_TYPES, 
@@ -635,6 +636,11 @@ function App() {
                 <li>Contribute to global reef health monitoring</li>
               </ol>
             </div>
+          )}
+
+          {/* Coral Species Guide - NEW */}
+          {!result && !analyzing && !loading && (
+            <CoralGuide />
           )}
         </main>
       )}

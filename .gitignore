@@ -13,6 +13,7 @@
 
 # misc
 .DS_Store
+.env
 .env.local
 .env.development.local
 .env.test.local
@@ -21,4 +22,77 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.env 
+
+# Firebase configuration 
+# NOTE: Firebase config with API keys IS INTENTIONALLY PUBLIC for this project
+# Firebase security rules protect the database, not API key secrecy
+# The API keys are restricted in Firebase Console to specific domains
+# DO NOT add firebase config files to .gitignore - they need to be public for app to work
+
+# Firebase cache and logs (these should be ignored)
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Training data (large files, not needed in repo)
+/training_data/
+/datasets/
+*.onnx.bak
+/models/*.onnx.backup
+
+# Python virtual environments (if using for ML training)
+venv/
+env/
+ENV/
+coral_env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Jupyter notebooks (if doing ML work)
+.ipynb_checkpoints
+*.ipynb
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# OS files
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Large media files (if storing locally)
+/uploads/
+/user-uploads/
+
+# Sensitive data
+secrets.json
+*.pem
+*.key
+*.cert
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+# Package manager lock files (optional - comment out if you want to commit)
+# package-lock.json
+# yarn.lock
+
+# Build artifacts from GitHub Actions
+/.github/workflows/artifacts/

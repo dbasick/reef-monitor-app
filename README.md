@@ -9,7 +9,7 @@
 
 **AI-powered mobile app for real-time coral reef health monitoring**
 
-[🌊 Try Live Demo](https://dbasick.github.io/reef-monitor-app/) | [📧 Contact Developer](mailto:DaBasick@yahoo.com)
+[🌊 Try Live Demo](https://reef-monitor.netlify.app) | [📧 Contact Developer](mailto:DaBasick@yahoo.com)
 
 </div>
 
@@ -17,19 +17,20 @@
 
 ## 📱 About
 
-Reef Monitor brings professional-grade AI coral health analysis to your phone. Designed for marine biologists, dive operators, conservationists, and reef enthusiasts in the USVI and beyond. Take a photo, get instant analysis, and contribute to community reef health monitoring—all while working completely offline.
+Reef Monitor brings professional-grade AI coral health analysis to your phone. Designed for marine biologists, dive operators, conservationists, and reef enthusiasts in the USVI and beyond. Take a photo, get instant analysis, learn about Caribbean coral species, and contribute to community reef health monitoring—all while working completely offline.
 
 ### ✨ Key Features
 
-- 🤖 **AI-Powered Analysis** - Advanced machine learning identifies coral health status in seconds
-- 📸 **Instant Assessment** - Point, shoot, analyze—get results before you surface (mobile camera or upload)
-- 🌐 **Offline AI Processing** - Model runs in your browser, no server needed after initial download
-- ☁️ **Cloud Sync** - Observations automatically upload when online (requires internet)
+- 🤖 **AI-Powered Health Analysis** - Advanced machine learning identifies coral health status in seconds
+- 🪸 **Caribbean Coral Guide** - Interactive reference guide with 18 common USVI species
+- 📸 **Instant Assessment** - Point, shoot, analyze—get results before you surface
+- 🌐 **Offline Capable** - AI runs in your browser, no server needed after initial download
+- ☁️ **Cloud Sync** - Observations automatically upload when online
 - 📊 **Community Database** - Your observations contribute to reef conservation efforts
-- 🔒 **Privacy First** - Control what location data you share (GPS, dive sites, or general areas)
+- 🗺️ **Interactive Map** - Visualize community observations across USVI dive sites
+- 🔒 **Privacy First** - Control what location data you share
 - 💾 **Track Your Dives** - Automatic history of all your observations
-- 📱 **Install as App** - Add to your home screen for native app experience
-- 🎯 **USVI Dive Sites** - Pre-loaded with local dive site locations
+- 📱 **Install as App** - Add to home screen for native app experience
 
 ---
 
@@ -40,8 +41,6 @@ Reef Monitor brings professional-grade AI coral health analysis to your phone. D
 **📸 Take Photo → 🤖 AI Analysis → 📍 Add Location → ☁️ Sync to Cloud**
 
 Simple, fast, and accurate coral health monitoring in the field.
-
-*Note: Mobile devices show camera option, desktop shows upload option*
 
 </div>
 
@@ -60,7 +59,54 @@ Each result includes:
 
 ---
 
-## 🏗️ Technical Overview
+## 🪸 Caribbean Coral Guide
+
+**NEW FEATURE:** Learn to identify 18 common coral species found in USVI waters!
+
+### Featured Species
+
+**Critically Endangered (3)**
+- Elkhorn Coral (*Acropora palmata*)
+- Staghorn Coral (*Acropora cervicornis*)
+- Pillar Coral (*Dendrogyra cylindrus*)
+
+**Endangered (3)**
+- Mountainous Star Coral (*Orbicella faveolata*)
+- Lobed Star Coral (*Orbicella annularis*)
+- Boulder Star Coral (*Orbicella franksi*)
+
+**Common Species (7)**
+- Mustard Hill Coral (*Porites astreoides*) - Most abundant on USVI reefs
+- Lettuce Coral (*Agaricia agaricites*)
+- Massive Starlet Coral (*Siderastrea siderea*)
+- Great Star Coral (*Montastraea cavernosa*)
+- Finger Coral (*Porites porites*)
+- Lesser Starlet Coral (*Siderastrea radians*)
+- Blushing Star Coral (*Stephanocoenia intersepta*)
+
+**Brain Corals & Others (5)**
+- Boulder Brain Coral (*Colpophyllia natans*)
+- Symmetrical Brain Coral (*Pseudodiploria strigosa*)
+- Grooved Brain Coral (*Diploria labyrinthiformis*)
+- Smooth Flower Coral (*Eusmilia fastigiata*)
+- Elliptical Star Coral (*Dichocoenia stokesii*)
+
+### Guide Features
+
+- **High-quality photos** from iNaturalist research observations
+- **Detailed descriptions** for each species
+- **Identification tips** to distinguish similar corals
+- **USVI status notes** on local abundance and threats
+- **Conservation status** (IUCN Red List)
+- **Habitat information** and depth ranges
+- **Search functionality** to quickly find species
+- **Threat factors** affecting each species
+
+All coral photos properly attributed to photographers with Creative Commons licensing.
+
+---
+
+## 🗺️ Technical Overview
 
 ### Architecture
 
@@ -92,11 +138,14 @@ Each result includes:
 
 ### Model Specifications
 
+**Health Classification Model:**
 - **Input:** 224×224 RGB images, normalized
 - **Architecture:** Convolutional Neural Network (CNN)
 - **Accuracy:** ~80% on validation dataset
 - **Inference:** ~1 second on mobile devices
 - **Size:** 77MB (one-time download, cached locally)
+
+**Coming Soon:** Species identification model (in development)
 
 ### Technology Stack
 
@@ -104,8 +153,9 @@ Each result includes:
 - **AI Runtime:** ONNX Runtime Web (browser-based inference)
 - **Database:** Firebase (Firestore + Storage)
 - **Authentication:** Firebase Anonymous Auth (automatic, no login required)
-- **Mapping:** Leaflet with OpenStreetMap satellite imagery
-- **Hosting:** GitHub Pages / Netlify
+- **Mapping:** React Leaflet with OpenStreetMap satellite imagery
+- **Educational Content:** 18-species coral reference guide
+- **Hosting:** Netlify (production) / GitHub Pages (development)
 - **Platform:** Cross-platform PWA (iOS, Android, Desktop)
 
 ---
@@ -114,11 +164,14 @@ Each result includes:
 
 ### Access the App
 
-**🌐 Live App:**  
+**🌐 Live Production App:**  
+👉 [https://reef-monitor.netlify.app](https://reef-monitor.netlify.app)
+
+**🔬 Development Version (Latest Features):**  
 👉 [https://dbasick.github.io/reef-monitor-app/](https://dbasick.github.io/reef-monitor-app/)
 
 **📲 Install on Your Phone:**
-1. Visit the link above on your mobile browser
+1. Visit the production link on your mobile browser
 2. Wait for the AI model to download (~77MB, one-time only)
 3. Tap your browser's "Add to Home Screen" option
 4. Launch from your home screen like a native app
@@ -126,7 +179,7 @@ Each result includes:
 **✅ Requirements:**
 - Modern mobile browser (Safari, Chrome, Edge)
 - ~100MB free storage for app and model
-- Internet connection for initial setup and cloud sync (AI works offline after setup)
+- Internet connection for initial setup and cloud sync
 - Camera access for photo capture (mobile devices)
 - GPS access for location tagging (optional)
 
@@ -142,6 +195,7 @@ Each result includes:
 - Keep phone steady during capture
 - Capture multiple angles for confidence
 - Add detailed notes for research value
+- Use coral guide to confirm species in the field
 
 **Location Options:**
 - **Exact GPS** - Precise coordinates (optional)
@@ -152,11 +206,15 @@ Each result includes:
 
 ### For Dive Operators
 
-Track coral health across your regular dive sites. Monitor changes over time. Contribute to local conservation efforts. Share findings with marine authorities.
+Track coral health across your regular dive sites. Monitor changes over time. Use the coral guide to educate clients. Contribute to local conservation efforts. Share findings with marine authorities.
 
 ### For Citizen Scientists
 
-Every scan contributes to understanding USVI reef health. Your observations help researchers identify trends, track bleaching events, and prioritize conservation efforts.
+Every scan contributes to understanding USVI reef health. Your observations help researchers identify trends, track bleaching events, and prioritize conservation efforts. Learn to identify coral species with the built-in guide.
+
+### For Educators
+
+Use the coral guide as a teaching tool. Show students how to identify common USVI species. Track coral health over field trips. Contribute student observations to the community database.
 
 ---
 
@@ -173,11 +231,11 @@ Every scan contributes to understanding USVI reef health. Your observations help
 - Coral health classification
 - Location information (at your chosen privacy level)
 - Timestamp of observation
-- Image (compressed, for verification and research)
-- Anonymous user ID (auto-generated by Firebase, not linked to you)
+- Image (compressed, for verification)
+- Anonymous user ID (auto-generated, not linked to you)
 
 **What We DON'T Collect:**
-- Personal identifying information (name, email, etc.)
+- Personal identifying information
 - User accounts or passwords
 - Device tracking or analytics
 - Browsing history
@@ -199,31 +257,48 @@ All observations are anonymous by default.
 ### Marine Research
 - Document bleaching events in real-time
 - Track coral health over multiple dive seasons
-- Collect geo-tagged observations for scientific studies
+- Collect geo-tagged observations for studies
 - Monitor specific dive sites longitudinally
+- Use coral guide for species confirmation
+
+### Conservation Monitoring
+- Identify areas of concern
+- Track restoration project success
+- Document coral recovery or decline
+- Support conservation priority decisions
+
+### Education & Outreach
+- Teach coral identification to students
+- Engage public in citizen science
+- Demonstrate reef health trends
+- Build awareness of conservation needs
 
 ---
 
 ## 🗺️ Project Roadmap
 
-### Current Version (1.0)
+### Current Version (v1.1 - December 2025)
 - ✅ Binary classification (Healthy vs Bleached)
+- ✅ **Caribbean Coral Guide (18 USVI species)**
 - ✅ Offline AI inference (browser-based)
 - ✅ Firebase cloud database with automatic sync
-- ✅ Anonymous authentication (no login required)
+- ✅ Anonymous authentication
 - ✅ Interactive community observation map
 - ✅ Mobile camera integration
 - ✅ Location privacy controls
-- ✅ USVI dive site database with GPS coordinates
+- ✅ USVI dive site database
+
+### In Development
+- 🔄 Coral species identification AI (multi-class model)
+- 🔄 Expanded coral guide (additional species)
 
 ### Planned Features
-- 🔄 Multi-class coral health (Healthy, Bleached, Dead, Diseased)
-- 🔄 Export scan history as CSV
-- 🔄 Coral species identification
-- 🔄 Batch scanning mode
-- 🔄 Integration with reef monitoring databases
-- 🔄 Multi-language support
-- 🔄 Offline maps for dive sites
+- 📋 Multi-class coral health (Healthy, Bleached, Dead, Diseased)
+- 📋 Export scan history as CSV
+- 📋 Batch scanning mode
+- 📋 Integration with reef monitoring databases
+- 📋 Multi-language support
+- 📋 Offline maps for dive sites
 
 ---
 
@@ -231,28 +306,35 @@ All observations are anonymous by default.
 
 **Developer:** Daniel Basick  
 **Email:** [DaBasick@yahoo.com](mailto:DaBasick@yahoo.com)  
-**Project Repository:** Private (contact for inquiries)
+**Production Site:** [reef-monitor.netlify.app](https://reef-monitor.netlify.app)  
+**Development Site:** [dbasick.github.io/reef-monitor-app](https://dbasick.github.io/reef-monitor-app/)
 
 ### Questions?
 - **Technical issues?** Email with screenshots and description
+- **Research collaboration?** Contact for data sharing opportunities
+- **Feature requests?** We'd love to hear your ideas
 
 ### Acknowledgments
 
-Built for the USVI marine conservation community. Special thanks to local dive operators, marine biologists, and citizen scientists who inspired this project.
+Built for the USVI marine conservation community. Special thanks to:
+- Local dive operators and marine biologists who inspired this project
+- iNaturalist community for coral identification photos
+- Citizen scientists contributing observations
 
-Powered by advanced AI technology to support ocean conservation efforts.
+**Photo Credits:** Coral guide photos from [iNaturalist Caribbean Coral Guide](https://www.inaturalist.org/guides/19437) by various photographers. Individual attributions displayed in app.
 
 ---
 
-## 📝 License & Terms
+## 📜 License & Terms
 
 **Copyright © 2025 Daniel Basick. All Rights Reserved.**
 
-This software is proprietary. The application is provided for use by marine researchers, conservationists, and ocean enthusiasts. 
+This software is proprietary. The application is provided for use by marine researchers, conservationists, and ocean enthusiasts.
 
 **Usage Terms:**
 - ✅ Free for personal, educational, and research use
 - ✅ Data contributed to community database helps conservation efforts
+- ✅ Coral guide photos used under Creative Commons licenses
 - ❌ Redistribution or modification of the application is prohibited
 - ❌ Commercial use requires prior written permission
 
@@ -262,9 +344,9 @@ For licensing inquiries, contact: DaBasick@yahoo.com
 
 ## 📈 Project Status
 
-**Version:** 1.0.0  
+**Version:** 1.1.0  
 **Status:** 🟢 Production Ready  
-**Last Updated:** December 2025  
+**Last Updated:** December 30, 2025  
 **Maintained By:** Daniel Basick
 
 **Platforms:**
@@ -272,6 +354,13 @@ For licensing inquiries, contact: DaBasick@yahoo.com
 - iOS (via PWA)
 - Android (via PWA)
 - Desktop (via PWA)
+
+**Recent Updates:**
+- Added 18-species Caribbean coral identification guide
+- Proper photo attribution for all coral species
+- USVI-specific status notes for each species
+- Enhanced search and filter functionality
+- Improved mobile responsiveness
 
 ---
 
