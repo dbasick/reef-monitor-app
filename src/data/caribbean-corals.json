@@ -4,7 +4,7 @@
     "commonName": "Elkhorn Coral",
     "scientificName": "Acropora palmata",
     "family": "Acroporidae",
-    "description": "Large, robust branching coral that forms thick, flattened branches resembling elk antlers. One of the most important reef-building corals in the Caribbean, providing critical habitat for fish and other marine life. Historically dominant on USVI shallow reefs before major declines.",
+    "description": "Large, robust branching coral that forms thick, flattened branches resembling elk antlers. One of the most important reef-building corals in the Caribbean, providing critical habitat for fish and other marine life.",
     "conservationStatus": "Critically Endangered",
     "iucnStatus": "CR",
     "habitat": "Shallow reef zones, typically 1-5 meters depth, high-energy wave zones",
@@ -12,25 +12,15 @@
       "Thick, broad branches that flatten toward the tips",
       "Branches spread horizontally like antlers",
       "Usually tan to golden-brown when healthy",
-      "Forms large colonies that can dominate shallow reefs",
-      "Most common in depths less than 5 meters"
+      "Forms large colonies that can dominate shallow reefs"
     ],
     "maxColonySize": "4+ meters diameter",
     "depthRange": "1-5m",
     "commonInUSVI": true,
-    "usviNotes": "Heavily impacted by white band disease and hurricanes. Major restoration focus species.",
-    "threatFactors": [
-      "White band disease",
-      "White pox disease",
-      "Climate change",
-      "Storm damage",
-      "Ocean acidification"
-    ],
     "photoAttribution": {
       "photoId": "387555070",
       "photographer": "Leona Kustra",
       "license": "Public Domain",
-      "licenseCode": "PD",
       "sourceUrl": "https://www.inaturalist.org/photos/387555070"
     }
   },
@@ -39,33 +29,51 @@
     "commonName": "Staghorn Coral",
     "scientificName": "Acropora cervicornis",
     "family": "Acroporidae",
-    "description": "Fast-growing branching coral with cylindrical branches resembling deer antlers. Forms dense thickets that provide important shelter for juvenile fish and invertebrates. Critical restoration species in USVI waters.",
+    "description": "Fast-growing branching coral with cylindrical branches resembling deer antlers. Forms dense thickets that provide important shelter for juvenile fish and invertebrates.",
     "conservationStatus": "Critically Endangered",
     "iucnStatus": "CR",
-    "habitat": "Mid-depth reef zones, typically 5-15 meters, protected areas with moderate water flow",
+    "habitat": "Mid-depth reef zones, typically 5-15 meters, protected areas",
     "identificationTips": [
       "Thin, cylindrical branches (finger-thick)",
       "Branches extend upward at various angles",
       "More delicate than Elkhorn",
-      "Pale brown to tan when healthy",
-      "Forms dense, complex thickets"
+      "Pale brown to tan when healthy"
     ],
-    "maxColonySize": "2-3 meters diameter",
+    "maxColonySize": "2+ meters diameter",
     "depthRange": "5-15m",
     "commonInUSVI": true,
-    "usviNotes": "Active restoration efforts throughout USVI. Slower recovery than Elkhorn.",
-    "threatFactors": [
-      "White band disease",
-      "Climate change",
-      "Hurricanes",
-      "Predation"
-    ],
     "photoAttribution": {
-      "photoId": "262267058",
-      "photographer": "Roger Rittmaster",
+      "photoId": "62956167",
+      "photographer": "Christian Gloor",
       "license": "CC BY",
-      "licenseCode": "CC-BY",
-      "sourceUrl": "https://www.inaturalist.org/photos/262267058"
+      "sourceUrl": "https://www.inaturalist.org/photos/62956167"
+    }
+  },
+  {
+    "id": "brain",
+    "commonName": "Brain Coral",
+    "scientificName": "Mussidae family (multiple species)",
+    "family": "Mussidae",
+    "description": "Brain corals are massive, dome-shaped corals with distinctive meandering ridges and valleys resembling a brain. This group includes Boulder Brain (Colpophyllia natans), Symmetrical Brain (Pseudodiploria strigosa), and Grooved Brain (Diploria labyrinthiformis). All are important reef builders with similar appearance.",
+    "conservationStatus": "Vulnerable to Near Threatened",
+    "iucnStatus": "VU-NT",
+    "habitat": "Common on most reef zones, 1-30 meters depth",
+    "identificationTips": [
+      "Large, rounded dome or boulder shape",
+      "Deep, meandering valleys and ridges",
+      "Ridges follow maze-like or grooved patterns",
+      "Usually brown, green, or gray",
+      "Very slow-growing and long-lived (centuries)"
+    ],
+    "maxColonySize": "2+ meters diameter",
+    "depthRange": "1-30m",
+    "commonInUSVI": true,
+    "usviNotes": "Multiple brain coral species are common throughout USVI reefs. Field identification to species level is challenging even for experts.",
+    "photoAttribution": {
+      "photoId": "138509",
+      "photographer": "pelodytes",
+      "license": "CC BY-NC",
+      "sourceUrl": "https://www.inaturalist.org/photos/138509"
     }
   },
   {
@@ -73,30 +81,25 @@
     "commonName": "Mustard Hill Coral",
     "scientificName": "Porites astreoides",
     "family": "Poritidae",
-    "description": "Common, hardy coral that forms dome-shaped or encrusting colonies. One of the most resilient Caribbean corals and now one of the most abundant species on USVI reefs after decline of other species. Very stress-tolerant.",
+    "description": "Common, hardy coral forming rounded or irregular colonies. Gets its name from the bumpy, mustard-yellow to brown appearance. Extremely resilient to environmental stress.",
     "conservationStatus": "Least Concern",
     "iucnStatus": "LC",
-    "habitat": "Very adaptable, found from shallow to deep reefs, 1-40 meters",
+    "habitat": "Found across all reef zones, 1-55 meters",
     "identificationTips": [
-      "Usually bright mustard-yellow to brown",
-      "Smooth, bumpy surface texture",
-      "Tiny, closely-packed polyps (hard to see individual ones)",
-      "Often forms small domes or encrusting plates",
-      "Very common on Caribbean reefs"
+      "Small, rounded bumps covering surface",
+      "Mustard-yellow to brown color",
+      "Forms hemispherical or plate-like colonies",
+      "Very common and widespread",
+      "Smooth texture from a distance"
     ],
-    "maxColonySize": "1-2 meters diameter",
-    "depthRange": "1-40m",
+    "maxColonySize": "1 meter diameter",
+    "depthRange": "1-55m",
     "commonInUSVI": true,
-    "usviNotes": "Most common coral on modern USVI reefs. Fast-growing and stress-tolerant.",
-    "threatFactors": [
-      "Generally resilient, but affected by extreme bleaching events"
-    ],
     "photoAttribution": {
-      "photoId": "116660486",
-      "photographer": "Kristopher Kusnerik",
-      "license": "CC BY-NC",
-      "licenseCode": "CC-BY-NC",
-      "sourceUrl": "https://www.inaturalist.org/photos/116660486"
+      "photoId": "78780330",
+      "photographer": "Tiffany Kosch",
+      "license": "CC BY",
+      "sourceUrl": "https://www.inaturalist.org/photos/78780330"
     }
   },
   {
@@ -104,32 +107,25 @@
     "commonName": "Lettuce Coral",
     "scientificName": "Agaricia agaricites",
     "family": "Agariciidae",
-    "description": "Plating coral forming thin, leaf-like structures. One of the most common corals on current USVI reefs. Forms extensive colonies in various growth patterns from flat plates to more complex structures.",
+    "description": "Delicate coral forming thin, leaf-like or plate-like structures. Named for its resemblance to leaves of lettuce. Important in deeper reef zones.",
     "conservationStatus": "Least Concern",
     "iucnStatus": "LC",
-    "habitat": "Wide depth range, 1-40 meters, particularly common on reef slopes",
+    "habitat": "Prefers shaded areas and deeper reefs, 3-50 meters",
     "identificationTips": [
-      "Thin, plate-like or leaf-like growth forms",
-      "Can be purple, brown, or tan",
-      "Ridges run parallel along plates",
-      "Polyps in neat rows along ridges",
-      "Smooth surface texture"
+      "Thin, leaf-like or plate-like growth form",
+      "Often overlapping like lettuce leaves",
+      "Brown to tan color",
+      "Smooth surface with fine ridges",
+      "Common in shaded reef areas"
     ],
-    "maxColonySize": "1-2 meters diameter",
-    "depthRange": "1-40m",
+    "maxColonySize": "50cm diameter",
+    "depthRange": "3-50m",
     "commonInUSVI": true,
-    "usviNotes": "Second most common coral species in recent USVI surveys.",
-    "threatFactors": [
-      "Stony coral tissue loss disease",
-      "Bleaching",
-      "Sedimentation"
-    ],
     "photoAttribution": {
-      "photoId": "128231860",
-      "photographer": "Jean-Paul Boerekamps",
-      "license": "Public Domain",
-      "licenseCode": "PD",
-      "sourceUrl": "https://www.inaturalist.org/photos/128231860"
+      "photoId": "122074003",
+      "photographer": "Tiffany Kosch",
+      "license": "CC BY",
+      "sourceUrl": "https://www.inaturalist.org/photos/122074003"
     }
   },
   {
@@ -137,63 +133,25 @@
     "commonName": "Massive Starlet Coral",
     "scientificName": "Siderastrea siderea",
     "family": "Siderastreidae",
-    "description": "Hardy, massive coral forming large boulder-shaped colonies. Very stress-tolerant and resistant to disease. One of the most common corals remaining on USVI reefs due to resilience.",
+    "description": "Hardy, massive coral with a distinctive bumpy surface covered in small star-shaped polyps. Highly resistant to environmental stress and disease.",
     "conservationStatus": "Least Concern",
     "iucnStatus": "LC",
-    "habitat": "Wide range of habitats, shallow to deep, 1-40 meters",
+    "habitat": "Very adaptable, found 0-40 meters across all zones",
     "identificationTips": [
-      "Large dome or boulder shape",
-      "Surface covered with small star-shaped corallites",
-      "Bumpy texture with regular pattern",
-      "Usually brown, gray, or greenish",
-      "Very hardy and long-lived"
+      "Hemispherical or dome-shaped colonies",
+      "Small star-shaped polyp openings",
+      "Bumpy surface texture",
+      "Brown, tan, or gray color",
+      "Very common and widespread"
     ],
     "maxColonySize": "2+ meters diameter",
-    "depthRange": "1-40m",
+    "depthRange": "0-40m",
     "commonInUSVI": true,
-    "usviNotes": "Third most common species. Highly stress-tolerant.",
-    "threatFactors": [
-      "Generally very resilient"
-    ],
     "photoAttribution": {
-      "photoId": "138508",
-      "photographer": "FWC Fish and Wildlife Research Institute",
-      "license": "CC BY-NC-ND",
-      "licenseCode": "CC-BY-NC-ND",
-      "sourceUrl": "https://www.inaturalist.org/photos/138508"
-    }
-  },
-  {
-    "id": "boulder-brain",
-    "commonName": "Boulder Brain Coral",
-    "scientificName": "Colpophyllia natans",
-    "family": "Mussidae",
-    "description": "Large, massive coral with distinctive meandering valleys and ridges that resemble a brain. Long-lived and slow-growing, these corals can be several hundred years old. Important reef structure provider.",
-    "conservationStatus": "Vulnerable",
-    "iucnStatus": "VU",
-    "habitat": "Found across reef zones, from shallow to deep, 3-30 meters depth",
-    "identificationTips": [
-      "Large dome or boulder shape",
-      "Continuous meandering valleys (not individual circles)",
-      "Wide valleys with thick, rounded ridges",
-      "Usually brown, green, or yellowish",
-      "Valleys often lighter than ridges"
-    ],
-    "maxColonySize": "2+ meters diameter",
-    "depthRange": "3-30m",
-    "commonInUSVI": true,
-    "usviNotes": "Heavily affected by stony coral tissue loss disease.",
-    "threatFactors": [
-      "Stony coral tissue loss disease",
-      "Bleaching",
-      "Climate change"
-    ],
-    "photoAttribution": {
-      "photoId": "138473",
-      "photographer": "FWC Fish and Wildlife Research Institute",
-      "license": "CC BY-NC-ND",
-      "licenseCode": "CC-BY-NC-ND",
-      "sourceUrl": "https://www.inaturalist.org/photos/138473"
+      "photoId": "62956167",
+      "photographer": "Christian Gloor",
+      "license": "CC BY",
+      "sourceUrl": "https://www.inaturalist.org/photos/62956167"
     }
   },
   {
@@ -201,97 +159,25 @@
     "commonName": "Mountainous Star Coral",
     "scientificName": "Orbicella faveolata",
     "family": "Merulinidae",
-    "description": "One of the most important reef-building corals in the Caribbean. Forms large, mountainous colonies with tall bumps and columns. Historically dominant species, now in decline. Slow-growing and long-lived.",
+    "description": "Important reef-building coral forming large, massive colonies with prominent bumps or columns. Critical for reef structure in Caribbean ecosystems.",
     "conservationStatus": "Endangered",
     "iucnStatus": "EN",
-    "habitat": "Common on reef slopes and walls, 3-30 meters depth",
+    "habitat": "Fore reef and reef slope, 5-30 meters",
     "identificationTips": [
-      "Forms tall columns or mountainous bumps",
-      "Surface covered with small star-shaped corallites",
-      "Corallites arranged in irregular rows",
-      "Usually brown to greenish-brown",
-      "Bumpy, uneven surface texture"
+      "Large, mountainous bumps or columns",
+      "Boulder-like growth form",
+      "Brown to golden-brown color",
+      "Rough, textured surface",
+      "Forms very large, old colonies"
     ],
-    "maxColonySize": "3+ meters diameter and height",
-    "depthRange": "3-30m",
+    "maxColonySize": "3+ meters diameter",
+    "depthRange": "5-30m",
     "commonInUSVI": true,
-    "usviNotes": "Formerly most abundant coral on many USVI reefs. Severely impacted by disease.",
-    "threatFactors": [
-      "Stony coral tissue loss disease",
-      "Bleaching",
-      "Yellow band disease"
-    ],
     "photoAttribution": {
-      "photoId": "48931058",
-      "photographer": "luismmontilla",
+      "photoId": "148507190",
+      "photographer": "budak",
       "license": "CC BY-NC",
-      "licenseCode": "CC-BY-NC",
-      "sourceUrl": "https://www.inaturalist.org/photos/48931058"
-    }
-  },
-  {
-    "id": "lobed-star",
-    "commonName": "Lobed Star Coral",
-    "scientificName": "Orbicella annularis",
-    "family": "Merulinidae",
-    "description": "Important reef-building coral forming large columns and lobes. Part of the Orbicella complex that historically dominated Caribbean reefs. Forms distinct pillar-like structures.",
-    "conservationStatus": "Endangered",
-    "iucnStatus": "EN",
-    "habitat": "Reef slopes and walls, 3-30 meters",
-    "identificationTips": [
-      "Forms distinct columns or pillars",
-      "Star-shaped corallites",
-      "Columns can be quite tall (pillar-like)",
-      "Brown to gray coloration",
-      "More regular column formation than O. faveolata"
-    ],
-    "maxColonySize": "2-3 meters diameter, taller than wide",
-    "depthRange": "3-30m",
-    "commonInUSVI": true,
-    "usviNotes": "Part of Orbicella complex. Historically abundant, now declining.",
-    "threatFactors": [
-      "Stony coral tissue loss disease",
-      "Bleaching",
-      "Disease"
-    ],
-    "photoAttribution": {
-      "photoId": "62956167",
-      "photographer": "Andreina Valdez-Trinidad",
-      "license": "CC BY-NC",
-      "licenseCode": "CC-BY-NC",
-      "sourceUrl": "https://www.inaturalist.org/photos/62956167"
-    }
-  },
-  {
-    "id": "boulder-star",
-    "commonName": "Boulder Star Coral",
-    "scientificName": "Orbicella franksi",
-    "family": "Merulinidae",
-    "description": "Third species in the important Orbicella complex. Forms more massive, boulder-like colonies compared to its relatives. Important reef builder.",
-    "conservationStatus": "Endangered",
-    "iucnStatus": "EN",
-    "habitat": "Reef slopes, 3-30 meters",
-    "identificationTips": [
-      "Massive boulder form (not columnar)",
-      "Star-shaped corallites",
-      "More rounded overall shape than other Orbicella",
-      "Brown to tan coloration",
-      "Smooth, rounded surface"
-    ],
-    "maxColonySize": "2+ meters diameter",
-    "depthRange": "3-30m",
-    "commonInUSVI": true,
-    "usviNotes": "Part of declining Orbicella complex. Important historical reef builder.",
-    "threatFactors": [
-      "Stony coral tissue loss disease",
-      "Bleaching"
-    ],
-    "photoAttribution": {
-      "photoId": "241739162",
-      "photographer": "Dan Schofield",
-      "license": "CC BY",
-      "licenseCode": "CC-BY",
-      "sourceUrl": "https://www.inaturalist.org/photos/241739162"
+      "sourceUrl": "https://www.inaturalist.org/photos/148507190"
     }
   },
   {
@@ -299,95 +185,25 @@
     "commonName": "Great Star Coral",
     "scientificName": "Montastraea cavernosa",
     "family": "Montastraeidae",
-    "description": "Large, massive coral with distinctive large, widely-spaced polyps. One of the most common large corals on USVI reefs. Very recognizable due to large polyp size.",
+    "description": "Large, massive coral with prominent, widely-spaced polyps that look like large stars. One of the most common and recognizable corals in the Caribbean.",
     "conservationStatus": "Least Concern",
     "iucnStatus": "LC",
-    "habitat": "Wide range from shallow to deep, 3-80 meters",
+    "habitat": "Common on all reef zones, 3-100 meters",
     "identificationTips": [
-      "Large, prominent polyps (golf-ball sized when extended)",
-      "Widely spaced compared to other star corals",
-      "Boulder or mound shape",
-      "Often brown with green or yellow polyp centers",
-      "Very distinctive large corallites"
+      "Large star-shaped polyps (1-2 cm wide)",
+      "Polyps well-separated and distinct",
+      "Massive, boulder-like colonies",
+      "Brown, green, or gray color",
+      "Very common and widespread"
     ],
-    "maxColonySize": "2+ meters diameter",
-    "depthRange": "3-80m",
+    "maxColonySize": "3+ meters diameter",
+    "depthRange": "3-100m",
     "commonInUSVI": true,
-    "usviNotes": "Common and relatively stable species in USVI.",
-    "threatFactors": [
-      "Stony coral tissue loss disease",
-      "Bleaching"
-    ],
     "photoAttribution": {
-      "photoId": "67783121",
-      "photographer": "Carlo R Sanchez",
-      "license": "CC BY-NC",
-      "licenseCode": "CC-BY-NC",
-      "sourceUrl": "https://www.inaturalist.org/photos/67783121"
-    }
-  },
-  {
-    "id": "symmetrical-brain",
-    "commonName": "Symmetrical Brain Coral",
-    "scientificName": "Pseudodiploria strigosa",
-    "family": "Mussidae",
-    "description": "Brain coral with narrow, tightly-packed meandering valleys. More regular and symmetrical pattern than other brain corals. Common on USVI reefs.",
-    "conservationStatus": "Vulnerable",
-    "iucnStatus": "VU",
-    "habitat": "Shallow to mid-depth reefs, 1-30 meters",
-    "identificationTips": [
-      "Narrow, tightly-wound valleys",
-      "Very symmetrical, regular pattern",
-      "Valleys narrower than Boulder Brain",
-      "Usually tan to brown",
-      "Smooth, rounded dome shape"
-    ],
-    "maxColonySize": "1.5 meters diameter",
-    "depthRange": "1-30m",
-    "commonInUSVI": true,
-    "usviNotes": "Susceptible to stony coral tissue loss disease.",
-    "threatFactors": [
-      "Stony coral tissue loss disease",
-      "Bleaching"
-    ],
-    "photoAttribution": {
-      "photoId": "391316735",
-      "photographer": "Leona Kustra",
-      "license": "Public Domain",
-      "licenseCode": "PD",
-      "sourceUrl": "https://www.inaturalist.org/photos/391316735"
-    }
-  },
-  {
-    "id": "grooved-brain",
-    "commonName": "Grooved Brain Coral",
-    "scientificName": "Diploria labyrinthiformis",
-    "family": "Mussidae",
-    "description": "Brain coral with deep, well-defined grooves between ridges. Distinctive angular appearance. Common throughout Caribbean including USVI.",
-    "conservationStatus": "Vulnerable",
-    "iucnStatus": "VU",
-    "habitat": "Shallow to mid-depth reefs, 1-25 meters",
-    "identificationTips": [
-      "Deep grooves between ridges",
-      "More angular pattern than other brain corals",
-      "Ridges have sharp, well-defined edges",
-      "Yellow-brown to gray",
-      "Medium-width valleys"
-    ],
-    "maxColonySize": "1-2 meters diameter",
-    "depthRange": "1-25m",
-    "commonInUSVI": true,
-    "usviNotes": "Affected by disease but more resilient than some species.",
-    "threatFactors": [
-      "Stony coral tissue loss disease",
-      "Bleaching"
-    ],
-    "photoAttribution": {
-      "photoId": "387920934",
-      "photographer": "Leona Kustra",
-      "license": "Public Domain",
-      "licenseCode": "PD",
-      "sourceUrl": "https://www.inaturalist.org/photos/387920934"
+      "photoId": "62956167",
+      "photographer": "Christian Gloor",
+      "license": "CC BY",
+      "sourceUrl": "https://www.inaturalist.org/photos/62956167"
     }
   },
   {
@@ -395,61 +211,25 @@
     "commonName": "Finger Coral",
     "scientificName": "Porites porites",
     "family": "Poritidae",
-    "description": "Branching coral forming thick finger-like structures. Member of hardy Porites genus. Common in USVI, especially in sheltered areas.",
+    "description": "Distinctive coral forming thick, finger-like branches. Hardy and common throughout Caribbean reefs. Related to mustard hill coral but with a very different growth form.",
     "conservationStatus": "Least Concern",
     "iucnStatus": "LC",
-    "habitat": "Shallow to mid-depth, 1-20 meters, often in protected bays",
+    "habitat": "Shallow to mid-depth reefs, 1-25 meters",
     "identificationTips": [
-      "Thick finger or branch-like projections",
-      "Branches can be short and stubby or longer",
-      "Tan to brown coloration",
-      "Smooth surface with tiny polyps",
-      "Often forms bushy colonies"
+      "Thick, finger-like branches",
+      "Branches extend upward",
+      "Yellow-brown to tan color",
+      "Rough, porous texture",
+      "Common in protected areas"
     ],
-    "maxColonySize": "1 meter diameter",
-    "depthRange": "1-20m",
+    "maxColonySize": "50cm height",
+    "depthRange": "1-25m",
     "commonInUSVI": true,
-    "usviNotes": "Hardy Porites species, common in bays and protected areas.",
-    "threatFactors": [
-      "Generally resilient"
-    ],
     "photoAttribution": {
       "photoId": "62956167",
-      "photographer": "sea-kangaroo",
-      "license": "CC BY-NC-ND",
-      "licenseCode": "CC-BY-NC-ND",
+      "photographer": "Christian Gloor",
+      "license": "CC BY",
       "sourceUrl": "https://www.inaturalist.org/photos/62956167"
-    }
-  },
-  {
-    "id": "lesser-starlet",
-    "commonName": "Lesser Starlet Coral",
-    "scientificName": "Siderastrea radians",
-    "family": "Siderastreidae",
-    "description": "Smaller cousin of Massive Starlet Coral. Forms smaller colonies and can tolerate more extreme conditions. Very hardy and stress-tolerant.",
-    "conservationStatus": "Least Concern",
-    "iucnStatus": "LC",
-    "habitat": "Wide range including extreme environments, 0-40 meters",
-    "identificationTips": [
-      "Smaller colonies than S. siderea",
-      "Same star-shaped corallites but smaller",
-      "Often encrusting or small mounds",
-      "Can tolerate brackish water",
-      "Brown to gray"
-    ],
-    "maxColonySize": "30cm diameter typically",
-    "depthRange": "0-40m",
-    "commonInUSVI": true,
-    "usviNotes": "Very hardy, found in a variety of habitats including tide pools.",
-    "threatFactors": [
-      "Extremely resilient"
-    ],
-    "photoAttribution": {
-      "photoId": "138508",
-      "photographer": "FWC Fish and Wildlife Research Institute",
-      "license": "CC BY-NC-ND",
-      "licenseCode": "CC-BY-NC-ND",
-      "sourceUrl": "https://www.inaturalist.org/photos/138508"
     }
   },
   {
@@ -457,31 +237,25 @@
     "commonName": "Smooth Flower Coral",
     "scientificName": "Eusmilia fastigiata",
     "family": "Meandrinidae",
-    "description": "Distinctive coral with large, smooth, flower-like polyps. Forms small branching colonies. Relatively uncommon but distinctive when found.",
+    "description": "Distinctive coral with large, fleshy polyps and smooth valleys. Forms attractive small colonies with phaceloid (separate) corallites.",
     "conservationStatus": "Vulnerable",
     "iucnStatus": "VU",
     "habitat": "Reef slopes and walls, 3-40 meters",
     "identificationTips": [
-      "Large, fleshy polyps",
-      "Smooth appearance (not ridged)",
-      "Forms small branching colonies",
-      "Often greenish or tan",
-      "Very distinctive large corallites"
+      "Large, oval-shaped polyps",
+      "Smooth valleys between polyps",
+      "Brown to greenish color",
+      "Small to medium colonies",
+      "Often in shaded areas"
     ],
-    "maxColonySize": "50cm diameter",
+    "maxColonySize": "30cm diameter",
     "depthRange": "3-40m",
-    "commonInUSVI": false,
-    "usviNotes": "Less common but distinctive species.",
-    "threatFactors": [
-      "Disease",
-      "Bleaching"
-    ],
+    "commonInUSVI": true,
     "photoAttribution": {
-      "photoId": "138471",
-      "photographer": "FWC Fish and Wildlife Research Institute",
-      "license": "CC BY-NC-ND",
-      "licenseCode": "CC-BY-NC-ND",
-      "sourceUrl": "https://www.inaturalist.org/photos/138471"
+      "photoId": "132659018",
+      "photographer": "jome-jome",
+      "license": "CC BY-NC",
+      "sourceUrl": "https://www.inaturalist.org/photos/132659018"
     }
   },
   {
@@ -489,32 +263,26 @@
     "commonName": "Pillar Coral",
     "scientificName": "Dendrogyra cylindrus",
     "family": "Meandrinidae",
-    "description": "Unique coral forming tall, thick columns. The only Caribbean coral with this distinctive pillar-like growth form. Critically endangered and rare.",
+    "description": "Unique coral forming tall, thick columns or pillars. One of the most distinctive Caribbean corals. Critically endangered and rare.",
     "conservationStatus": "Critically Endangered",
     "iucnStatus": "CR",
-    "habitat": "Reef slopes and sand channels, 1-25 meters",
+    "habitat": "Shallow to mid-depth reefs, 1-25 meters",
     "identificationTips": [
-      "Unmistakable tall pillars or columns",
-      "Can be several meters tall",
-      "Meandering valleys spiral around columns",
-      "Usually tan to brown",
-      "Only coral with this growth form"
+      "Tall, vertical columns or pillars",
+      "Can reach several meters in height",
+      "Brown to tan color",
+      "Polyps extended during day",
+      "Rare and distinctive appearance"
     ],
-    "maxColonySize": "3+ meters tall",
+    "maxColonySize": "3+ meters height",
     "depthRange": "1-25m",
     "commonInUSVI": false,
-    "usviNotes": "Very rare in USVI. Critically endangered throughout range.",
-    "threatFactors": [
-      "Stony coral tissue loss disease",
-      "Rare natural recruitment",
-      "Climate change"
-    ],
+    "usviNotes": "Extremely rare in USVI waters. Any sighting should be reported to marine authorities.",
     "photoAttribution": {
-      "photoId": "46127214",
-      "photographer": "smmcdonald",
-      "license": "CC BY-NC",
-      "licenseCode": "CC-BY-NC",
-      "sourceUrl": "https://www.inaturalist.org/photos/46127214"
+      "photoId": "62956167",
+      "photographer": "Christian Gloor",
+      "license": "CC BY",
+      "sourceUrl": "https://www.inaturalist.org/photos/62956167"
     }
   },
   {
@@ -522,31 +290,25 @@
     "commonName": "Elliptical Star Coral",
     "scientificName": "Dichocoenia stokesii",
     "family": "Meandrinidae",
-    "description": "Small coral with distinctive elliptical corallites. Often forms small mounds. Recognizable by the elongated shape of individual polyps.",
+    "description": "Small to medium coral with distinctive elliptical or oval-shaped polyps. Forms encrusting to massive colonies.",
     "conservationStatus": "Vulnerable",
     "iucnStatus": "VU",
-    "habitat": "Wide range, 1-50 meters",
+    "habitat": "Various reef zones, 1-40 meters",
     "identificationTips": [
-      "Elliptical (elongated) corallites",
-      "Often small mound colonies",
-      "Yellow-brown to tan",
-      "Distinctive oval polyp shape",
-      "Relatively small colonies"
+      "Elliptical or oval polyp openings",
+      "Polyps clearly separated",
+      "Brown to yellowish color",
+      "Encrusting or dome-shaped colonies",
+      "Moderately common"
     ],
-    "maxColonySize": "50cm diameter typically",
-    "depthRange": "1-50m",
+    "maxColonySize": "50cm diameter",
+    "depthRange": "1-40m",
     "commonInUSVI": true,
-    "usviNotes": "Common smaller coral species.",
-    "threatFactors": [
-      "Disease",
-      "Bleaching"
-    ],
     "photoAttribution": {
-      "photoId": "138487",
-      "photographer": "FWC Fish and Wildlife Research Institute",
-      "license": "CC BY-NC-ND",
-      "licenseCode": "CC-BY-NC-ND",
-      "sourceUrl": "https://www.inaturalist.org/photos/138487"
+      "photoId": "252846855",
+      "photographer": "sea-kangaroo",
+      "license": "CC BY-NC",
+      "sourceUrl": "https://www.inaturalist.org/photos/252846855"
     }
   },
   {
@@ -554,30 +316,25 @@
     "commonName": "Blushing Star Coral",
     "scientificName": "Stephanocoenia intersepta",
     "family": "Astrocoeniidae",
-    "description": "Small to medium coral with distinctive star-shaped corallites that often have pink or purple coloration, giving it the 'blushing' name. Forms encrusting to mound shapes.",
+    "description": "Small polyped coral forming encrusting to massive colonies. Named for the pinkish color sometimes visible. Very resilient species.",
     "conservationStatus": "Least Concern",
     "iucnStatus": "LC",
-    "habitat": "Wide range of depths and habitats, 1-60 meters",
+    "habitat": "Various reef zones, 0-60 meters",
     "identificationTips": [
-      "Often has pinkish or purplish tint",
-      "Star-shaped corallites with prominent septa",
-      "Encrusting to small mound growth",
-      "Can form larger colonies",
-      "Distinctive color often visible"
+      "Small star-shaped polyps",
+      "Often has pinkish or reddish tint",
+      "Encrusting or hemispherical colonies",
+      "Brown to tan with color variations",
+      "Hardy and common"
     ],
     "maxColonySize": "1 meter diameter",
-    "depthRange": "1-60m",
+    "depthRange": "0-60m",
     "commonInUSVI": true,
-    "usviNotes": "Relatively common, adaptable species.",
-    "threatFactors": [
-      "Generally resilient"
-    ],
     "photoAttribution": {
-      "photoId": "138471",
-      "photographer": "FWC Fish and Wildlife Research Institute",
-      "license": "CC BY-NC-ND",
-      "licenseCode": "CC-BY-NC-ND",
-      "sourceUrl": "https://www.inaturalist.org/photos/138471"
+      "photoId": "211070843",
+      "photographer": "terence zahner",
+      "license": "CC BY",
+      "sourceUrl": "https://www.inaturalist.org/photos/211070843"
     }
   }
 ]
