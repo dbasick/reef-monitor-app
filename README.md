@@ -164,7 +164,7 @@ All coral photos properly attributed to photographers with Creative Commons lice
 - **Database:** Firebase (Firestore + Storage)
 - **Authentication:** Firebase Anonymous Auth (automatic, no login required)
 - **Mapping:** React Leaflet with OpenStreetMap satellite imagery
-- **Educational Content:** 18-species coral reference guide
+- **Educational Content:** 13-species coral reference guide
 - **Hosting:** Netlify (production) / GitHub Pages (development)
 - **Platform:** Cross-platform PWA (iOS, Android, Desktop)
 
