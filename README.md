@@ -22,14 +22,15 @@ Reef Monitor brings professional-grade AI coral health analysis to your phone. D
 ### ✨ Key Features
 
 - 🤖 **AI-Powered Health Analysis** - Advanced machine learning identifies coral health status in seconds
+- 📦 **Batch Scanning Mode** - Upload and analyze multiple coral images from a single dive site
 - 🪸 **Caribbean Coral Guide** - Interactive reference guide with 13 common USVI species
 - 📸 **Instant Assessment** - Point, shoot, analyze—get results before you surface
 - 🌐 **Offline Capable** - AI runs in your browser, no server needed after initial download
 - ☁️ **Cloud Sync** - Observations automatically upload when online
 - 📊 **Community Database** - Your observations contribute to reef conservation efforts
-- 🗺️ **Interactive Map** - Visualize community observations across USVI dive sites
+- 🗺️ **Interactive Map** - Visualize community observations with clustered markers showing sample counts
 - 🔒 **Privacy First** - Control what location data you share
-- 💾 **Track Your Dives** - Automatic history of all your observations
+- 💾 **Track Your Dives** - Automatic history of all your observations (singles and batches)
 - 📱 **Install as App** - Add to home screen for native app experience
 
 ---
@@ -38,11 +39,25 @@ Reef Monitor brings professional-grade AI coral health analysis to your phone. D
 
 <div align="center">
 
-**📸 Take Photo → 🤖 AI Analysis → 📍 Add Location → ☁️ Sync to Cloud**
+**📸 Upload Photo(s) → 🤖 AI Analysis → 📍 Add Location → ☁️ Sync to Cloud**
 
 Simple, fast, and accurate coral health monitoring in the field.
 
 </div>
+
+### Single Scan Mode
+1. Upload a single coral image
+2. AI analyzes health status with confidence score
+3. Add location details (GPS, dive site, or general area)
+4. Save to personal history and community database
+
+### Batch Scan Mode (NEW)
+1. Lock location first (dive site, custom site, or GPS)
+2. Upload multiple images (1-50) from that location
+3. AI processes all images with health classification
+4. Review results - select high-confidence observations to save
+5. Flag uncertain images for later review
+6. All observations saved with the same location data
 
 ### Analysis Results
 
@@ -192,6 +207,15 @@ All coral photos properly attributed to photographers with Creative Commons lice
 - Add detailed notes for research value
 - Use coral guide to confirm species in the field
 
+**Batch Scanning Workflow:**
+- Perfect for systematic site surveys
+- Lock location once, then upload 1-50 images
+- AI processes entire batch with health classification
+- Review and select high-confidence observations
+- Flag uncertain images for later expert review
+- All observations tagged with identical location data
+- Efficient data collection for multiple specimens
+
 **Location Options:**
 - **Exact GPS** - Precise coordinates (optional)
 - **Dive Sites** - Pre-populated USVI locations
@@ -272,9 +296,13 @@ All observations are anonymous by default.
 
 ## 🗺️ Project Roadmap
 
-### Current Version (v1.1 - January 2026)
+### Current Version (v1.2 - January 2026)
 - ✅ Binary classification (Healthy vs Bleached)
-- ✅ **Caribbean Coral Guide (13 USVI species)**
+- ✅ **Batch Scanning Mode** (upload 1-50 images per dive site)
+- ✅ **Review Queue System** (flag uncertain images for expert review)
+- ✅ **Enhanced Map View** (clustered markers with count badges, scrollable image galleries)
+- ✅ **Firebase History** (personal scan history loads from cloud, includes batch grouping)
+- ✅ Caribbean Coral Guide (13 USVI species)
 - ✅ Offline AI inference (browser-based)
 - ✅ Firebase cloud database with automatic sync
 - ✅ Anonymous authentication
@@ -284,13 +312,13 @@ All observations are anonymous by default.
 - ✅ USVI dive site database
 
 ### In Development
+- 🔄 Review queue admin interface (approve/reject flagged observations)
 - 🔄 Coral species identification AI (multi-class model)
 - 🔄 Expanded coral guide (additional species)
 
 ### Planned Features
 - 📋 Multi-class coral health (Healthy, Bleached, Dead, Diseased)
 - 📋 Export scan history as CSV
-- 📋 Batch scanning mode
 - 📋 Integration with reef monitoring databases
 - 📋 Multi-language support
 - 📋 Offline maps for dive sites
@@ -339,9 +367,9 @@ For licensing inquiries, contact: DaBasick@yahoo.com
 
 ## 📈 Project Status
 
-**Version:** 1.1.0  
+**Version:** 1.2.0  
 **Status:** 🟢 Production Ready  
-**Last Updated:** January 7, 2026  
+**Last Updated:** January 11, 2026  
 **Maintained By:** Daniel Basick
 
 **Platforms:**
@@ -351,12 +379,13 @@ For licensing inquiries, contact: DaBasick@yahoo.com
 - Desktop (via PWA)
 
 **Recent Updates:**
-- Fixed brain coral photo attribution (replaced incorrect image)
-- Added 13-species Caribbean coral identification guide
-- Proper photo attribution for all coral species with CC licensing
-- USVI-specific status notes for each species
-- Enhanced search and filter functionality
-- Improved mobile responsiveness
+- Added batch scanning mode (1-50 images per dive site)
+- Implemented review queue system for uncertain observations
+- Enhanced map view with clustered markers and count badges
+- Firebase-powered personal history (singles + batches)
+- Improved single/batch workflow with streamlined UI
+- Fixed coordinate mapping for dive site observations
+- Added scrollable image galleries in map popups
 
 ---
 
