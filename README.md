@@ -22,7 +22,7 @@ Reef Monitor brings professional-grade AI coral health analysis to your phone. D
 ### ✨ Key Features
 
 - 🤖 **AI-Powered Health Analysis** - Advanced machine learning identifies coral health status in seconds
-- 🪸 **Caribbean Coral Guide** - Interactive reference guide with 18 common USVI species
+- 🪸 **Caribbean Coral Guide** - Interactive reference guide with 13 common USVI species
 - 📸 **Instant Assessment** - Point, shoot, analyze—get results before you surface
 - 🌐 **Offline Capable** - AI runs in your browser, no server needed after initial download
 - ☁️ **Cloud Sync** - Observations automatically upload when online
@@ -61,40 +61,35 @@ Each result includes:
 
 ## 🪸 Caribbean Coral Guide
 
-**NEW FEATURE:** Learn to identify 18 common coral species found in USVI waters!
+**NEW FEATURE:** Learn to identify 13 common coral species found in USVI waters!
 
 ### Featured Species
 
-**Critically Endangered (3)**
+**Critically Endangered (2)**
 - Elkhorn Coral (*Acropora palmata*)
 - Staghorn Coral (*Acropora cervicornis*)
 - Pillar Coral (*Dendrogyra cylindrus*)
 
-**Endangered (3)**
+**Endangered (1)**
 - Mountainous Star Coral (*Orbicella faveolata*)
-- Lobed Star Coral (*Orbicella annularis*)
-- Boulder Star Coral (*Orbicella franksi*)
 
-**Common Species (7)**
+**Vulnerable (2)**
+- Smooth Flower Coral (*Eusmilia fastigiata*)
+- Elliptical Star Coral (*Dichocoenia stokesii*)
+
+**Common Species (8)**
+- Brain Coral (Mussidae family - multiple species)
 - Mustard Hill Coral (*Porites astreoides*) - Most abundant on USVI reefs
 - Lettuce Coral (*Agaricia agaricites*)
 - Massive Starlet Coral (*Siderastrea siderea*)
 - Great Star Coral (*Montastraea cavernosa*)
 - Finger Coral (*Porites porites*)
-- Lesser Starlet Coral (*Siderastrea radians*)
 - Blushing Star Coral (*Stephanocoenia intersepta*)
-
-**Brain Corals & Others (5)**
-- Boulder Brain Coral (*Colpophyllia natans*)
-- Symmetrical Brain Coral (*Pseudodiploria strigosa*)
-- Grooved Brain Coral (*Diploria labyrinthiformis*)
-- Smooth Flower Coral (*Eusmilia fastigiata*)
-- Elliptical Star Coral (*Dichocoenia stokesii*)
 
 ### Guide Features
 
 - **High-quality photos** from iNaturalist research observations
-- **Detailed descriptions** for each species
+- **Detailed descriptions** for each of 13 species
 - **Identification tips** to distinguish similar corals
 - **USVI status notes** on local abundance and threats
 - **Conservation status** (IUCN Red List)
@@ -277,9 +272,9 @@ All observations are anonymous by default.
 
 ## 🗺️ Project Roadmap
 
-### Current Version (v1.1 - December 2025)
+### Current Version (v1.1 - January 2026)
 - ✅ Binary classification (Healthy vs Bleached)
-- ✅ **Caribbean Coral Guide (18 USVI species)**
+- ✅ **Caribbean Coral Guide (13 USVI species)**
 - ✅ Offline AI inference (browser-based)
 - ✅ Firebase cloud database with automatic sync
 - ✅ Anonymous authentication
@@ -346,7 +341,7 @@ For licensing inquiries, contact: DaBasick@yahoo.com
 
 **Version:** 1.1.0  
 **Status:** 🟢 Production Ready  
-**Last Updated:** December 30, 2025  
+**Last Updated:** January 7, 2026  
 **Maintained By:** Daniel Basick
 
 **Platforms:**
@@ -356,8 +351,9 @@ For licensing inquiries, contact: DaBasick@yahoo.com
 - Desktop (via PWA)
 
 **Recent Updates:**
-- Added 18-species Caribbean coral identification guide
-- Proper photo attribution for all coral species
+- Fixed brain coral photo attribution (replaced incorrect image)
+- Added 13-species Caribbean coral identification guide
+- Proper photo attribution for all coral species with CC licensing
 - USVI-specific status notes for each species
 - Enhanced search and filter functionality
 - Improved mobile responsiveness

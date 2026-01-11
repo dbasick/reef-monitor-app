@@ -96,3 +96,7 @@ secrets.json
 
 # Build artifacts from GitHub Actions
 /.github/workflows/artifacts/
+ 
+#additional backup patterns 
+*Copy.* 
+*(working)* 

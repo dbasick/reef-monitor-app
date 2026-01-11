@@ -13,28 +13,48 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-// Custom colored markers
-const createColorIcon = (color) => {
+// Custom colored markers with count badge
+const createMarkerWithBadge = (color, count) => {
   return L.divIcon({
-    className: 'custom-marker',
-    html: `<div style="
-      background-color: ${color};
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: 2px solid white;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    "></div>`,
-    iconSize: [20, 20],
-    iconAnchor: [10, 10]
+    className: 'custom-marker-with-badge',
+    html: `
+      <div style="position: relative;">
+        <div style="
+          background-color: ${color};
+          width: 25px;
+          height: 25px;
+          border-radius: 50%;
+          border: 3px solid white;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        "></div>
+        ${count > 1 ? `
+          <div style="
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #2563eb;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          ">${count}</div>
+        ` : ''}
+      </div>
+    `,
+    iconSize: [25, 25],
+    iconAnchor: [12, 12]
   });
 };
 
-const healthyIcon = createColorIcon('#22c55e'); // green
-const bleachedIcon = createColorIcon('#ef4444'); // red
-
 const MapView = ({ onBack }) => {
-  const [observations, setObservations] = useState([]);
+  const [observationGroups, setObservationGroups] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -55,12 +75,9 @@ const MapView = ({ onBack }) => {
             });
           }
           // CASE 2: Legacy observation with dive site ID but no coordinates
-          // Look up coordinates from USVI_DIVE_SITES array
           else if (data.location?.siteId && !data.isSensitive) {
             const site = USVI_DIVE_SITES.find(s => s.id === data.location.siteId);
             if (site) {
-              // Temporarily add coordinates for map display
-              // (doesn't modify Firebase, just for this session)
               obs.push({
                 id: doc.id,
                 ...data,
@@ -69,7 +86,6 @@ const MapView = ({ onBack }) => {
                   coordinates: { lat: site.lat, lng: site.lng }
                 }
               });
-              console.log(`✓ Added coordinates for legacy observation at ${site.name}`);
             }
           }
           // CASE 3: Custom sites with user-provided coordinates
@@ -81,8 +97,21 @@ const MapView = ({ onBack }) => {
           }
         });
         
-        console.log(`Loaded ${obs.length} observations for map (including ${querySnapshot.size - obs.length} without location data)`);
-        setObservations(obs);
+        // Group observations by location (within ~10 meters)
+        const grouped = {};
+        obs.forEach(observation => {
+          const lat = observation.location.coordinates.lat.toFixed(4);
+          const lng = observation.location.coordinates.lng.toFixed(4);
+          const key = `${lat},${lng}`;
+          
+          if (!grouped[key]) {
+            grouped[key] = [];
+          }
+          grouped[key].push(observation);
+        });
+        
+        console.log(`Loaded ${obs.length} observations grouped into ${Object.keys(grouped).length} locations`);
+        setObservationGroups(grouped);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching observations:', error);
@@ -144,39 +173,79 @@ const MapView = ({ onBack }) => {
           maxZoom={18}
         />
         
-        {observations.map(obs => (
-          <Marker
-            key={obs.id}
-            position={[obs.location.coordinates.lat, obs.location.coordinates.lng]}
-            icon={obs.prediction === 'Healthy Coral' ? healthyIcon : bleachedIcon}
-          >
-            <Popup>
-              <div style={{ minWidth: '150px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-                {obs.imageUrl && (
-                  <img 
-                    src={obs.imageUrl} 
-                    alt="coral observation" 
-                    style={{ width: '100%', marginBottom: '8px', borderRadius: '4px' }}
-                  />
-                )}
-                <p style={{ margin: '4px 0', fontWeight: 'bold' }}>
-                  {obs.prediction}
-                </p>
-                <p style={{ margin: '4px 0', fontSize: '0.9em' }}>
-                  Confidence: {parseFloat(obs.confidence).toFixed(1)}%
-                </p>
-                <p style={{ margin: '4px 0', fontSize: '0.85em', color: '#666' }}>
-                  {new Date(obs.timestamp.seconds * 1000).toLocaleDateString()}
-                </p>
-                {(obs.location?.diveSite || obs.location?.siteName || obs.location?.customSiteName) && (
-                  <p style={{ margin: '4px 0', fontSize: '0.85em' }}>
-                    📍 {obs.location.diveSite || obs.location.siteName || obs.location.customSiteName}
+        {Object.entries(observationGroups).map(([locationKey, observations]) => {
+          const firstObs = observations[0];
+          const healthyCount = observations.filter(o => o.prediction === 'Healthy Coral').length;
+          const bleachedCount = observations.length - healthyCount;
+          const markerColor = healthyCount > bleachedCount ? '#22c55e' : '#ef4444';
+          
+          return (
+            <Marker
+              key={locationKey}
+              position={[firstObs.location.coordinates.lat, firstObs.location.coordinates.lng]}
+              icon={createMarkerWithBadge(markerColor, observations.length)}
+            >
+              <Popup maxWidth={400} maxHeight={500}>
+                <div style={{ 
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  maxHeight: '450px',
+                  overflowY: 'auto'
+                }}>
+                  <h3 style={{ margin: '0 0 8px 0', fontSize: '16px' }}>
+                    📍 {firstObs.location.siteName || firstObs.location.customSiteName || 'Unknown Site'}
+                  </h3>
+                  <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: '#666' }}>
+                    {observations.length} observation{observations.length > 1 ? 's' : ''} at this location
+                    {observations.length > 1 && ` (${healthyCount} healthy, ${bleachedCount} bleached)`}
                   </p>
-                )}
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {observations.map((obs, idx) => (
+                      <div key={obs.id} style={{
+                        borderBottom: idx < observations.length - 1 ? '1px solid #e5e7eb' : 'none',
+                        paddingBottom: '12px'
+                      }}>
+                        {obs.imageUrl && (
+                          <img 
+                            src={obs.imageUrl} 
+                            alt="coral observation" 
+                            style={{ 
+                              width: '100%', 
+                              marginBottom: '6px', 
+                              borderRadius: '4px',
+                              cursor: 'pointer'
+                            }}
+                            onClick={() => window.open(obs.imageUrl, '_blank')}
+                          />
+                        )}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ 
+                            fontWeight: 'bold', 
+                            color: obs.prediction === 'Healthy Coral' ? '#22c55e' : '#ef4444',
+                            fontSize: '14px'
+                          }}>
+                            {obs.prediction === 'Healthy Coral' ? '🪸 Healthy' : '⚠️ Bleached'}
+                          </span>
+                          <span style={{ fontSize: '13px', color: '#666' }}>
+                            {parseFloat(obs.confidence).toFixed(1)}%
+                          </span>
+                        </div>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#999' }}>
+                          {new Date(obs.timestamp.seconds * 1000).toLocaleDateString()} at {new Date(obs.timestamp.seconds * 1000).toLocaleTimeString()}
+                        </p>
+                        {obs.source === 'batch' && obs.batchId && (
+                          <p style={{ margin: '2px 0 0 0', fontSize: '11px', color: '#3b82f6' }}>
+                            📦 Batch scan
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
       </MapContainer>
     </div>
   );

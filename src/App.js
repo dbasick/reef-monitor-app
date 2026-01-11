@@ -5,12 +5,16 @@ import './App.css';
 import LocationPicker from './components/LocationPicker';
 import MapView from './components/MapView';
 import CoralGuide from './components/CoralGuide';
+import BatchScanner from './BatchScanner';
 import { 
-  saveObservation, 
+  saveObservation,
+  saveBatchObservations,
   LOCATION_TYPES, 
   USVI_DIVE_SITES, 
   GENERAL_AREAS 
 } from './firebase/database';
+import { auth, db } from './firebase/config';
+import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 
 // Class labels for coral health - BINARY MODEL
 const CLASS_LABELS = ['Bleached Coral', 'Healthy Coral'];
@@ -22,6 +26,7 @@ function App() {
   const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [expandedBatch, setExpandedBatch] = useState(null);
   const [showMap, setShowMap] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
@@ -44,6 +49,9 @@ function App() {
   const [currentImageFile, setCurrentImageFile] = useState(null);
   const [showWelcome, setShowWelcome] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // View mode state - single or batch
+  const [viewMode, setViewMode] = useState('single'); // 'single' or 'batch'
 
   // Load model on component mount
   useEffect(() => {
@@ -86,10 +94,88 @@ function App() {
     }
   };
 
-  const loadHistory = () => {
-    const saved = localStorage.getItem('reefMonitorHistory');
-    if (saved) {
-      setHistory(JSON.parse(saved));
+  const loadHistory = async () => {
+    console.log('🔍 loadHistory called');
+    try {
+      // Check if user is authenticated
+      if (!auth.currentUser) {
+        console.log('❌ No user logged in, skipping history load');
+        return;
+      }
+
+      const userId = auth.currentUser.uid;
+      console.log('✅ User authenticated:', userId);
+      
+      // Query observations for current user
+      const observationsRef = collection(db, 'observations');
+      const q = query(
+        observationsRef,
+        where('userId', '==', userId),
+        orderBy('timestamp', 'desc')
+      );
+      
+      console.log('📡 Querying Firebase...');
+      const querySnapshot = await getDocs(q);
+      console.log(`📦 Got ${querySnapshot.size} documents from Firebase`);
+      
+      // Group by batchId for batch scans
+      const batches = {};
+      const singles = [];
+      
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        console.log('📄 Document:', doc.id, data);
+        const historyItem = {
+          id: doc.id,
+          prediction: data.prediction,
+          confidence: data.confidence,
+          imageUrl: data.imageUrl,
+          timestamp: data.timestamp?.toDate?.() || new Date(data.timestamp),
+          location: data.location,
+          source: data.source || 'single',
+          batchId: data.batchId,
+          batchIndex: data.batchIndex,
+          synced: true
+        };
+        
+        if (data.batchId) {
+          // Batch scan - group by batchId
+          if (!batches[data.batchId]) {
+            batches[data.batchId] = [];
+          }
+          batches[data.batchId].push(historyItem);
+        } else {
+          // Single scan
+          singles.push(historyItem);
+        }
+      });
+      
+      // Convert batches object to array and combine with singles
+      const batchArray = Object.entries(batches).map(([batchId, items]) => ({
+        id: batchId,
+        type: 'batch',
+        batchId: batchId,
+        items: items.sort((a, b) => a.batchIndex - b.batchIndex),
+        timestamp: items[0].timestamp,
+        location: items[0].location,
+        synced: true
+      }));
+      
+      // Combine and sort by timestamp
+      const allHistory = [...singles, ...batchArray].sort((a, b) => 
+        new Date(b.timestamp) - new Date(a.timestamp)
+      );
+      
+      console.log(`✅ Loaded ${allHistory.length} history items (${singles.length} singles, ${batchArray.length} batches)`);
+      setHistory(allHistory.slice(0, 50)); // Keep only 50 most recent
+      
+    } catch (error) {
+      console.error('❌ Error loading history from Firebase:', error);
+      // Fallback to localStorage if Firebase fails
+      const saved = localStorage.getItem('reefMonitorHistory');
+      if (saved) {
+        setHistory(JSON.parse(saved));
+      }
     }
   };
 
@@ -391,6 +477,16 @@ function App() {
     // Keep the result visible but without location data
   };
 
+  // Handle batch save
+  const handleBatchSave = async (selectedImages, reviewImages, location, isSensitive) => {
+    try {
+      await saveBatchObservations(selectedImages, reviewImages, location, isSensitive);
+    } catch (error) {
+      console.error('Error saving batch:', error);
+      throw error;
+    }
+  };
+
   const getHealthColor = (prediction) => {
     if (prediction.includes('Healthy')) return 'var(--coral-healthy)';
     if (prediction.includes('Bleached')) return 'var(--coral-warn)';
@@ -413,7 +509,10 @@ function App() {
         <div style={{ display: 'flex', gap: '10px' }}>
           <button 
             className="history-btn"
-            onClick={() => setShowHistory(!showHistory)}
+            onClick={() => {
+              setShowHistory(!showHistory);
+              if (!showHistory) loadHistory(); // Reload when opening
+            }}
             title="View History"
           >
             <History size={24} />
@@ -427,6 +526,8 @@ function App() {
           </button>
         </div>
       </header>
+
+      {/* Mode Toggle - REMOVED */}
 
       {/* Loading State - FIX #3: Only show if loading and no error */}
       {loading && !error && (
@@ -507,29 +608,27 @@ function App() {
       )}
 
       {/* Main Content */}
-      {!showHistory && !showMap && (
+      {!showHistory && !showMap && viewMode === 'single' && (
         <main className="main">
           {/* Action Buttons */}
           {!result && !loading && (
             <div className="action-section">
-              {/* Show "Take Photo" only on mobile */}
-              {isMobile && (
-                <button 
-                  className="action-btn primary"
-                  onClick={() => cameraInputRef.current?.click()}
-                >
-                  <Camera size={32} />
-                  <span>Take Photo</span>
-                </button>
-              )}
-              
-              {/* Show "Upload Image" always, but make it primary on desktop */}
+              {/* Upload Image - Single Scan */}
               <button 
-                className={`action-btn ${isMobile ? 'secondary' : 'primary'}`}
+                className="action-btn primary"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Upload size={32} />
                 <span>Upload Image</span>
+              </button>
+              
+              {/* Upload Batch Button */}
+              <button 
+                className="action-btn secondary"
+                onClick={() => setViewMode('batch')}
+              >
+                <Upload size={32} />
+                <span>Upload Batch</span>
               </button>
               
               <input
@@ -645,6 +744,35 @@ function App() {
         </main>
       )}
 
+      {/* Batch Scanner Mode */}
+      {!showHistory && !showMap && viewMode === 'batch' && (
+        <BatchScanner 
+          model={model}
+          locationType={locationType}
+          setLocationType={setLocationType}
+          selectedSite={selectedSite}
+          setSelectedSite={setSelectedSite}
+          selectedArea={selectedArea}
+          setSelectedArea={setSelectedArea}
+          customSiteName={customSiteName}
+          setCustomSiteName={setCustomSiteName}
+          customSiteIsland={customSiteIsland}
+          setCustomSiteIsland={setCustomSiteIsland}
+          customSiteDescription={customSiteDescription}
+          setCustomSiteDescription={setCustomSiteDescription}
+          useGPS={useGPS}
+          setUseGPS={setUseGPS}
+          isSensitive={isSensitive}
+          setIsSensitive={setIsSensitive}
+          LOCATION_TYPES={LOCATION_TYPES}
+          USVI_DIVE_SITES={USVI_DIVE_SITES}
+          GENERAL_AREAS={GENERAL_AREAS}
+          getCurrentGPSLocation={getCurrentGPSLocation}
+          onBatchSave={handleBatchSave}
+          onCancel={() => setViewMode('single')}
+        />
+      )}
+
       {/* History View */}
       {showHistory && (
         <div className="history-view">
@@ -660,30 +788,93 @@ function App() {
             </div>
           ) : (
             <div className="history-list">
-              {history.map((item) => (
-                <div key={item.id} className="history-item">
-                  <img src={item.imageUrl} alt="Historical scan" />
-                  <div className="history-info">
-                    <h4>{item.prediction}</h4>
-                    <p>{item.confidence}% confident</p>
-                    <span className="history-date">
-                      {new Date(item.timestamp).toLocaleDateString()}
-                    </span>
-                    {item.synced && <span className="cloud-badge">☁️</span>}
+              {history.map((item) => {
+                // Batch item
+                if (item.type === 'batch') {
+                  const healthyCount = item.items.filter(i => i.prediction === 'Healthy Coral').length;
+                  const bleachedCount = item.items.length - healthyCount;
+                  const isExpanded = expandedBatch === item.id;
+                  
+                  return (
+                    <div key={item.id}>
+                      <div 
+                        className="history-item batch-item"
+                        onClick={() => setExpandedBatch(isExpanded ? null : item.id)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <div className="batch-preview">
+                          {item.items.slice(0, 4).map((img, idx) => (
+                            <img 
+                              key={idx} 
+                              src={img.imageUrl} 
+                              alt={`Batch scan ${idx + 1}`}
+                            />
+                          ))}
+                          {item.items.length > 4 && (
+                            <div className="batch-more">+{item.items.length - 4}</div>
+                          )}
+                        </div>
+                        <div className="history-info">
+                          <h4>📦 Batch Scan - {item.items.length} images</h4>
+                          <p>{healthyCount} healthy, {bleachedCount} bleached</p>
+                          <span className="history-date">
+                            {new Date(item.timestamp).toLocaleDateString()}
+                          </span>
+                          {item.location?.siteName && (
+                            <p className="location-name">📍 {item.location.siteName}</p>
+                          )}
+                          {item.synced && <span className="cloud-badge">☁️</span>}
+                        </div>
+                        <div 
+                          className="history-indicator"
+                          style={{ backgroundColor: healthyCount > bleachedCount ? '#22c55e' : '#ef4444' }}
+                        />
+                      </div>
+                      
+                      {/* Expanded batch view */}
+                      {isExpanded && (
+                        <div className="batch-expanded">
+                          <div className="batch-expanded-grid">
+                            {item.items.map((img, idx) => (
+                              <div key={idx} className="batch-expanded-item">
+                                <img src={img.imageUrl} alt={`Image ${idx + 1}`} />
+                                <div className="batch-expanded-info">
+                                  <span className={img.prediction === 'Healthy Coral' ? 'healthy' : 'bleached'}>
+                                    {img.prediction === 'Healthy Coral' ? '🪸' : '⚠️'}
+                                  </span>
+                                  <span>{img.confidence?.toFixed?.(1)}%</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                
+                // Single item
+                return (
+                  <div key={item.id} className="history-item">
+                    <img src={item.imageUrl} alt="Historical scan" />
+                    <div className="history-info">
+                      <h4>{item.prediction}</h4>
+                      <p>{item.confidence?.toFixed?.(1) || item.confidence}% confident</p>
+                      <span className="history-date">
+                        {new Date(item.timestamp).toLocaleDateString()}
+                      </span>
+                      {item.location?.siteName && (
+                        <p className="location-name">📍 {item.location.siteName}</p>
+                      )}
+                      {item.synced && <span className="cloud-badge">☁️</span>}
+                    </div>
+                    <div 
+                      className="history-indicator"
+                      style={{ backgroundColor: getHealthColor(item.prediction) }}
+                    />
                   </div>
-                  <div 
-                    className="history-indicator"
-                    style={{ backgroundColor: getHealthColor(item.prediction) }}
-                  />
-                  <button 
-                    className="btn-delete-item"
-                    onClick={() => deleteFromHistory(item.id)}
-                    aria-label="Delete scan"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

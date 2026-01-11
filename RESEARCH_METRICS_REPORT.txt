@@ -1,0 +1,227 @@
+================================================================================
+BINARY CORAL HEALTH CLASSIFICATION MODEL - RESEARCH METRICS REPORT
+================================================================================
+Generated: January 9, 2026
+Model: Binary Classification (Healthy vs Bleached Coral)
+Test Dataset: 923 images
+
+================================================================================
+CONFUSION MATRIX ANALYSIS
+================================================================================
+
+Confusion Matrix Breakdown:
+                        Predicted Bleached    Predicted Healthy
+Actual Bleached                373                   112
+Actual Healthy                  65                   373
+
+Key Components:
+  True Negatives (TN):   373  - Correctly identified bleached corals
+  False Positives (FP):  112  - Bleached corals misidentified as healthy  
+  False Negatives (FN):   65  - Healthy corals misidentified as bleached
+  True Positives (TP):   373  - Correctly identified healthy corals
+
+Overall Accuracy: 80.82% (746 correct out of 923 total)
+
+================================================================================
+PER-CLASS PERFORMANCE METRICS
+================================================================================
+
+BLEACHED CORAL DETECTION:
+--------------------------
+Precision: 85.16%
+  → When model predicts "bleached", it's correct 85.16% of the time
+  → False alarm rate: 14.84%
+
+Recall (Sensitivity): 76.91%
+  → Successfully detects 76.91% of all bleached corals
+  → Misses 23.09% of bleached corals (112 out of 485 samples)
+
+F1-Score: 80.82%
+  → Balanced measure of precision and recall
+
+Support: 485 test samples
+
+
+HEALTHY CORAL DETECTION:
+-------------------------
+Precision: 76.91%
+  → When model predicts "healthy", it's correct 76.91% of the time
+  → False alarm rate: 23.09%
+
+Recall (Sensitivity): 85.16%
+  → Successfully detects 85.16% of all healthy corals
+  → Misses 14.84% of healthy corals (65 out of 438 samples)
+
+F1-Score: 80.82%
+  → Balanced measure of precision and recall
+
+Support: 438 test samples
+
+================================================================================
+CRITICAL METRICS FOR REEF MONITORING & CONSERVATION
+================================================================================
+
+BLEACHING EVENT DETECTION:
+--------------------------
+The model's ability to detect bleached corals is CRITICAL for conservation work.
+
+✓ STRENGTHS:
+  • High precision (85.16%) - When alerting to bleaching, it's reliable
+  • Low false alarm rate (14.84%) - Minimal unnecessary concern
+  • Good confidence for conservation decision-making
+
+⚠ AREAS FOR CONSIDERATION:
+  • Recall of 76.91% means ~23% of bleached corals are missed
+  • 112 bleached corals were misclassified as healthy in test set
+  • For early warning systems, higher recall may be desired
+
+HEALTHY CORAL IDENTIFICATION:
+------------------------------
+✓ STRENGTHS:
+  • High recall (85.16%) - Catches most healthy corals
+  • Good at not over-alarming (doesn't falsely flag healthy corals often)
+
+⚠ AREAS FOR CONSIDERATION:
+  • Precision of 76.91% - some healthy corals flagged as bleached
+  • 65 healthy corals misclassified as bleached (false alarms)
+  • May lead to some unnecessary investigation of healthy sites
+
+================================================================================
+TRADE-OFFS & INTERPRETATION
+================================================================================
+
+The model exhibits a balanced performance with a slight bias toward:
+  → HIGHER PRECISION for bleaching detection (85.16%)
+  → HIGHER RECALL for healthy detection (85.16%)
+
+This means:
+✓ When the model says "bleached", it's very likely correct (reliable alerts)
+✓ When the model says "healthy", it catches most healthy corals
+⚠ However, it misses ~23% of bleached corals (false negatives)
+
+For Conservation Work:
+----------------------
+This trade-off pattern is MODERATE for conservation applications:
+
+POSITIVE ASPECTS:
+  • High confidence in bleaching alerts (85% precision)
+  • Reliable for confirming bleaching when detected
+  • Low false alarm rate reduces survey fatigue
+
+CONSIDERATIONS:
+  • Missing 23% of bleached corals could delay intervention
+  • May benefit from adjusting classification threshold
+  • Consider using as screening tool with follow-up verification
+
+================================================================================
+COMPARISON TO RESEARCH STANDARDS
+================================================================================
+
+Target Accuracy for Research Publication: 85%+
+Current Overall Accuracy: 80.82%
+
+Status: APPROACHING research-grade threshold
+  • Within 5 percentage points of 85% target
+  • Suitable for pilot studies and field validation
+  • May benefit from additional training data for publication
+
+Performance Assessment:
+✓ EXCELLENT - Precision for bleaching detection (85.16%)
+✓ GOOD - Recall for healthy coral detection (85.16%)
+⚠ ACCEPTABLE - Recall for bleaching detection (76.91%)
+⚠ ACCEPTABLE - Precision for healthy detection (76.91%)
+
+================================================================================
+RECOMMENDATIONS FOR IMPROVEMENT
+================================================================================
+
+To reach 85%+ accuracy for research publication:
+
+1. INCREASE TRAINING DATA
+   • Current: ~9,000 images
+   • Target: 12,000-15,000 images
+   • Focus: More diverse bleached coral examples
+
+2. ADDRESS CLASS IMBALANCE
+   • Test set has more bleached (485) than healthy (438) samples
+   • Ensure balanced representation in training
+
+3. IMPROVE BLEACHING DETECTION RECALL
+   • Current: 76.91% (missing 23% of bleached corals)
+   • Target: 85%+ for conservation applications
+   • Consider lowering classification threshold
+
+4. DATA QUALITY REVIEW
+   • Verify labels on the 112 "missed" bleached corals
+   • Review the 65 false positive cases
+   • Some may be borderline/early bleaching cases
+
+5. MODEL ARCHITECTURE EXPLORATION
+   • Current: Custom CNN (19.4M parameters)
+   • Consider: Transfer learning from coral-specific models
+   • Explore: EfficientNet or ResNet with fine-tuning
+
+================================================================================
+SUMMARY FOR RESEARCH PRESENTATION
+================================================================================
+
+Model Performance:
+  Overall Accuracy:        80.82%
+  Bleached Detection:      Precision = 85.16%, Recall = 76.91%
+  Healthy Detection:       Precision = 76.91%, Recall = 85.16%
+
+Test Dataset:
+  Total samples:     923 images
+  Bleached corals:   485 samples (52.5%)
+  Healthy corals:    438 samples (47.5%)
+
+Model Architecture:
+  Type: Convolutional Neural Network (CNN)
+  Parameters: 19,396,801
+  Input size: 224×224×3 RGB images
+  Training data: 9,292 images
+
+Key Findings:
+  • Model achieves 80.82% accuracy on held-out test set
+  • High confidence (85% precision) when detecting bleaching
+  • Suitable for field screening with verification protocol
+  • Approaching research-grade threshold (85% target)
+  • Reliable tool for reef health monitoring applications
+
+================================================================================
+RESEARCH APPLICATIONS
+================================================================================
+
+This model is READY for:
+✓ Pilot field studies with manual verification
+✓ Screening tool for dive operators
+✓ Citizen science data collection
+✓ Educational reef monitoring programs
+✓ Preliminary bleaching event detection
+
+Requires further validation for:
+⚠ Primary diagnostic tool for research publications
+⚠ Automated early warning systems without verification
+⚠ High-stakes conservation decisions without human review
+
+================================================================================
+CONCLUSION
+================================================================================
+
+The binary coral health classification model demonstrates strong performance
+(80.82% accuracy) approaching research-grade standards. The model shows
+particular strength in precision for bleaching detection (85.16%), making it
+reliable when alerting to potential bleaching events.
+
+The current performance is SUITABLE for:
+  • Field screening and data collection
+  • Supporting human experts in reef assessment
+  • Educational and citizen science applications
+
+With additional training data and optimization, this model has clear potential
+to achieve the 85%+ accuracy threshold required for independent research 
+publication and deployment in autonomous monitoring systems.
+
+================================================================================
+END OF REPORT
+================================================================================

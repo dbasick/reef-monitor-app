@@ -346,6 +346,180 @@ export async function saveObservation(data) {
 }
 
 /**
+ * Save batch observations to Firebase
+ * @param {Array} selectedImages - Images selected for normal observations
+ * @param {Array} reviewImages - Images flagged for review queue
+ * @param {Object} location - Location data for entire batch
+ * @param {Boolean} isSensitive - Whether location is sensitive
+ */
+export const saveBatchObservations = async (selectedImages, reviewImages, location, isSensitive) => {
+  console.log('🔬 saveBatchObservations called');
+  console.log('  - Selected images:', selectedImages.length);
+  console.log('  - Review images:', reviewImages.length);
+  console.log('  - Location:', location);
+  
+  try {
+    // Ensure user is authenticated
+    await ensureAuth();
+    
+    const userId = auth.currentUser?.uid;
+    const batchId = `batch_${Date.now()}`;
+    
+    // Save regular observations
+    const savedObservations = await Promise.all(
+      selectedImages.map(async (imageData, index) => {
+        try {
+          // Compress and upload image
+          const compressedImage = await compressImage(imageData.file);
+          const imageId = `${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`;
+          const imageRef = ref(storage, `observations/${userId}/${batchId}/${imageData.name}`);
+          
+          const metadata = {
+            contentType: 'image/jpeg',
+            customMetadata: {
+              userId: userId,
+              prediction: imageData.result.prediction,
+              timestamp: new Date().toISOString(),
+              batchId: batchId
+            }
+          };
+          
+          await uploadBytes(imageRef, compressedImage, metadata);
+          const imageUrl = await getDownloadURL(imageRef);
+
+          // Prepare observation data
+          const observationData = {
+            userId: userId,
+            timestamp: Timestamp.now(),
+            prediction: imageData.result.prediction,
+            confidence: parseFloat(imageData.result.confidence),
+            allPredictions: imageData.result.allPredictions,
+            imageUrl: imageUrl,
+            imageId: imageId,
+            batchId: batchId,
+            batchIndex: index,
+            location: {
+              type: location.type,
+              ...(location.siteName && { siteName: location.siteName }),
+              ...(location.island && { island: location.island }),
+              ...(location.description && { description: location.description }),
+              ...(location.generalArea && { generalArea: location.generalArea }),
+              ...(location.coordinates && { coordinates: location.coordinates }),
+              ...(location.approximateCoordinates && { approximateCoordinates: location.approximateCoordinates }),
+              ...(location.accuracy && { accuracy: location.accuracy })
+            },
+            isSensitive: isSensitive,
+            source: 'batch',
+            deviceInfo: {
+              userAgent: navigator.userAgent,
+              platform: navigator.platform,
+              isIOS: /iPhone|iPad|iPod/.test(navigator.userAgent)
+            }
+          };
+
+          // Save to Firestore
+          const docRef = await addDoc(collection(db, 'observations'), observationData);
+          console.log(`✅ Saved observation ${index + 1}/${selectedImages.length}: ${docRef.id}`);
+          
+          return { success: true, id: docRef.id };
+        } catch (error) {
+          console.error(`❌ Failed to save image ${imageData.name}:`, error);
+          return { success: false, error: error.message };
+        }
+      })
+    );
+
+    // Save review queue items
+    const savedReviews = await Promise.all(
+      reviewImages.map(async (imageData, index) => {
+        try {
+          // Compress and upload image
+          const compressedImage = await compressImage(imageData.file);
+          const imageId = `review_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`;
+          const imageRef = ref(storage, `needs_review/${userId}/${batchId}/${imageData.name}`);
+          
+          const metadata = {
+            contentType: 'image/jpeg',
+            customMetadata: {
+              userId: userId,
+              prediction: imageData.result.prediction,
+              timestamp: new Date().toISOString(),
+              batchId: batchId,
+              reviewStatus: 'pending'
+            }
+          };
+          
+          await uploadBytes(imageRef, compressedImage, metadata);
+          const imageUrl = await getDownloadURL(imageRef);
+
+          // Prepare review data
+          const reviewData = {
+            userId: userId,
+            timestamp: Timestamp.now(),
+            prediction: imageData.result.prediction,
+            confidence: parseFloat(imageData.result.confidence),
+            allPredictions: imageData.result.allPredictions,
+            imageUrl: imageUrl,
+            imageId: imageId,
+            batchId: batchId,
+            batchIndex: index,
+            location: {
+              type: location.type,
+              ...(location.siteName && { siteName: location.siteName }),
+              ...(location.island && { island: location.island }),
+              ...(location.description && { description: location.description }),
+              ...(location.generalArea && { generalArea: location.generalArea }),
+              ...(location.coordinates && { coordinates: location.coordinates }),
+              ...(location.approximateCoordinates && { approximateCoordinates: location.approximateCoordinates }),
+              ...(location.accuracy && { accuracy: location.accuracy })
+            },
+            isSensitive: isSensitive,
+            reviewStatus: 'pending',
+            reviewReason: 'low_confidence',
+            source: 'batch',
+            deviceInfo: {
+              userAgent: navigator.userAgent,
+              platform: navigator.platform,
+              isIOS: /iPhone|iPad|iPod/.test(navigator.userAgent)
+            }
+          };
+
+          // Save to needs_review collection
+          const docRef = await addDoc(collection(db, 'needs_review'), reviewData);
+          console.log(`✅ Saved review ${index + 1}/${reviewImages.length}: ${docRef.id}`);
+          
+          return { success: true, id: docRef.id };
+        } catch (error) {
+          console.error(`❌ Failed to save review image ${imageData.name}:`, error);
+          return { success: false, error: error.message };
+        }
+      })
+    );
+
+    // Count successes
+    const observationSuccesses = savedObservations.filter(r => r.success).length;
+    const reviewSuccesses = savedReviews.filter(r => r.success).length;
+
+    console.log(`✅ Batch save complete: ${observationSuccesses}/${selectedImages.length} observations, ${reviewSuccesses}/${reviewImages.length} reviews`);
+
+    return {
+      success: true,
+      batchId,
+      observations: observationSuccesses,
+      reviews: reviewSuccesses,
+      total: observationSuccesses + reviewSuccesses
+    };
+
+  } catch (error) {
+    console.error('❌ Error in saveBatchObservations:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+};
+
+/**
  * Query observations from cloud database
  */
 export async function queryObservations(filters = {}) {
