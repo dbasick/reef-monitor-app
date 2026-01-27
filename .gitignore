@@ -89,6 +89,8 @@ secrets.json
 *.backup
 *.bak
 *.old
+*Copy.*
+*(working)*
 
 # Package manager lock files (optional - comment out if you want to commit)
 # package-lock.json
@@ -96,7 +98,3 @@ secrets.json
 
 # Build artifacts from GitHub Actions
 /.github/workflows/artifacts/
- 
-#additional backup patterns 
-*Copy.* 
-*(working)* 
