@@ -9,6 +9,7 @@ const CORAL_IMAGES = {
   'mustard-hill': 'https://inaturalist-open-data.s3.amazonaws.com/photos/116660486/medium.jpeg',
   'lettuce': 'https://inaturalist-open-data.s3.amazonaws.com/photos/128231860/medium.jpg',
   'massive-starlet': 'https://inaturalist-open-data.s3.amazonaws.com/photos/138508/medium.jpg',
+  'brain': 'https://inaturalist-open-data.s3.amazonaws.com/photos/138509/medium.jpg',
   'boulder-brain': 'https://inaturalist-open-data.s3.amazonaws.com/photos/138509/medium.jpg',
   'mountainous-star': 'https://inaturalist-open-data.s3.amazonaws.com/photos/48931058/medium.jpeg',
   'lobed-star': 'https://inaturalist-open-data.s3.amazonaws.com/photos/62956167/medium.jpeg',
