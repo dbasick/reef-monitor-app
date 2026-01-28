@@ -8,15 +8,8 @@ const CORAL_IMAGES = {
   'staghorn': 'https://inaturalist-open-data.s3.amazonaws.com/photos/262267058/medium.jpeg',
   'mustard-hill': 'https://inaturalist-open-data.s3.amazonaws.com/photos/116660486/medium.jpeg',
   'lettuce': 'https://inaturalist-open-data.s3.amazonaws.com/photos/128231860/medium.jpg',
-  
-  // FIXED: Massive starlet was showing S. radians (lesser starlet)
-  // Now uses photo 138509 which is actual S. siderea (was incorrectly on brain)
   'massive-starlet': 'https://inaturalist-open-data.s3.amazonaws.com/photos/138509/medium.jpg',
-  
-  // FIXED: Brain coral was showing Siderastrea siderea (star coral)
-  // Now uses grooved brain photo 387920934
   'brain': 'https://inaturalist-open-data.s3.amazonaws.com/photos/387920934/medium.jpeg',
-  
   'boulder-brain': 'https://inaturalist-open-data.s3.amazonaws.com/photos/138509/medium.jpg',
   'mountainous-star': 'https://inaturalist-open-data.s3.amazonaws.com/photos/48931058/medium.jpeg',
   'lobed-star': 'https://inaturalist-open-data.s3.amazonaws.com/photos/62956167/medium.jpeg',
@@ -26,15 +19,9 @@ const CORAL_IMAGES = {
   'grooved-brain': 'https://inaturalist-open-data.s3.amazonaws.com/photos/387920934/medium.jpeg',
   'finger': 'https://inaturalist-open-data.s3.amazonaws.com/photos/62956167/medium.jpeg',
   'lesser-starlet': 'https://inaturalist-open-data.s3.amazonaws.com/photos/138473/medium.jpg',
-  
-  // FIXED: These two were swapped
-  // Smooth flower now has photo 138471 (was on blushing-star)
   'smooth-flower': 'https://inaturalist-open-data.s3.amazonaws.com/photos/138471/medium.jpg',
-  
   'pillar': 'https://inaturalist-open-data.s3.amazonaws.com/photos/46127214/medium.jpeg',
   'elliptical-star': 'https://inaturalist-open-data.s3.amazonaws.com/photos/138487/medium.jpg',
-  
-  // FIXED: Blushing star now has photo 138470 (was on smooth-flower)
   'blushing-star': 'https://inaturalist-open-data.s3.amazonaws.com/photos/138470/medium.jpg'
 };
 
