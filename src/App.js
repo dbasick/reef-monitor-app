@@ -16,8 +16,8 @@ import {
 import { auth, db } from './firebase/config';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 
-// Class labels for coral health - BINARY MODEL
-const CLASS_LABELS = ['Bleached Coral', 'Healthy Coral'];
+// Class labels for coral health - 3-CLASS MODEL (v3c)
+const CLASS_LABELS = ['Bleached Coral', 'Healthy Coral', 'Not Coral'];
 
 function App() {
   const [model, setModel] = useState(null);
@@ -257,26 +257,19 @@ function App() {
       const results = await model.run(feeds);
       
       const output = results[Object.keys(results)[0]];
-      const healthyProb = output.data[0];
-      const bleachedProb = 1 - healthyProb;
-      
-      const isHealthy = healthyProb > 0.5;
-      const prediction = isHealthy ? CLASS_LABELS[1] : CLASS_LABELS[0];
-      const confidence = (isHealthy ? healthyProb : bleachedProb) * 100;
-      
+      // v3c outputs softmax over [bleached, healthy, non_coral]
+      const probs = Array.from(output.data);
+      const maxIdx = probs.indexOf(Math.max(...probs));
+      const prediction = CLASS_LABELS[maxIdx];
+      const confidence = probs[maxIdx] * 100;
+
       const resultData = {
         prediction: prediction,
         confidence: confidence.toFixed(1),
-        allPredictions: [
-          {
-            label: CLASS_LABELS[0],
-            confidence: (bleachedProb * 100).toFixed(1)
-          },
-          {
-            label: CLASS_LABELS[1],
-            confidence: (healthyProb * 100).toFixed(1)
-          }
-        ],
+        allPredictions: CLASS_LABELS.map((label, i) => ({
+          label: label,
+          confidence: (probs[i] * 100).toFixed(1)
+        })),
         imageUrl
       };
       
@@ -488,6 +481,7 @@ function App() {
   };
 
   const getHealthColor = (prediction) => {
+    if (prediction === 'Not Coral') return 'var(--coral-disease)';
     if (prediction.includes('Healthy')) return 'var(--coral-healthy)';
     if (prediction.includes('Bleached')) return 'var(--coral-warn)';
     if (prediction.includes('Dead')) return 'var(--coral-danger)';
@@ -495,6 +489,7 @@ function App() {
   };
 
   const getHealthIcon = (prediction) => {
+    if (prediction === 'Not Coral') return '🚫';
     if (prediction.includes('Healthy')) return '🪸';
     if (prediction.includes('Bleached')) return '⚠️';
     if (prediction.includes('Dead')) return '💀';
@@ -792,7 +787,8 @@ function App() {
                 // Batch item
                 if (item.type === 'batch') {
                   const healthyCount = item.items.filter(i => i.prediction === 'Healthy Coral').length;
-                  const bleachedCount = item.items.length - healthyCount;
+                  const bleachedCount = item.items.filter(i => i.prediction === 'Bleached Coral').length;
+                  const notCoralCount = item.items.filter(i => i.prediction === 'Not Coral').length;
                   const isExpanded = expandedBatch === item.id;
                   
                   return (
@@ -816,7 +812,7 @@ function App() {
                         </div>
                         <div className="history-info">
                           <h4>📦 Batch Scan - {item.items.length} images</h4>
-                          <p>{healthyCount} healthy, {bleachedCount} bleached</p>
+                          <p>{healthyCount} healthy, {bleachedCount} bleached{notCoralCount > 0 ? `, ${notCoralCount} not coral` : ''}</p>
                           <span className="history-date">
                             {new Date(item.timestamp).toLocaleDateString()}
                           </span>
@@ -825,9 +821,12 @@ function App() {
                           )}
                           {item.synced && <span className="cloud-badge">☁️</span>}
                         </div>
-                        <div 
+                        <div
                           className="history-indicator"
-                          style={{ backgroundColor: healthyCount > bleachedCount ? '#22c55e' : '#ef4444' }}
+                          style={{ backgroundColor:
+                            healthyCount >= bleachedCount && healthyCount >= notCoralCount ? '#22c55e' :
+                            bleachedCount >= notCoralCount ? '#ef4444' : '#9ca3af'
+                          }}
                         />
                       </div>
                       
@@ -839,8 +838,14 @@ function App() {
                               <div key={idx} className="batch-expanded-item">
                                 <img src={img.imageUrl} alt={`Image ${idx + 1}`} />
                                 <div className="batch-expanded-info">
-                                  <span className={img.prediction === 'Healthy Coral' ? 'healthy' : 'bleached'}>
-                                    {img.prediction === 'Healthy Coral' ? '🪸' : '⚠️'}
+                                  <span className={
+                                    img.prediction === 'Healthy Coral' ? 'healthy' :
+                                    img.prediction === 'Bleached Coral' ? 'bleached' : 'not-coral'
+                                  }>
+                                    {
+                                      img.prediction === 'Healthy Coral' ? '🪸' :
+                                      img.prediction === 'Bleached Coral' ? '⚠️' : '🚫'
+                                    }
                                   </span>
                                   <span>{img.confidence?.toFixed?.(1)}%</span>
                                 </div>

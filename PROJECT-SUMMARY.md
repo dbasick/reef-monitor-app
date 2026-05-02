@@ -229,6 +229,109 @@ appId: "1:930786260606:web:e0f0a3323cb8d2bd724a2f"
 
 ---
 
+## UVI Collaboration — 3-Class Health Model (v2)
+
+**Status:** Planning & data curation (as of March 2026)
+**Partner:** University of the Virgin Islands — postdoctoral researcher
+**Target publication:** Spring 2027
+
+### Goal
+
+Retrain the binary model (Healthy vs Bleached) into a 3-class model:
+- **Healthy Coral** — living tissue, normal coloration
+- **Unhealthy Coral** — bleached, diseased, dead skeleton, rubble
+- **Not Coral** — sand, algae, fish, seagrass, sponges, equipment, etc.
+
+This is **Option B** (stepping stone). The long-term plan (**Option A**) is a two-stage pipeline: an object detection model (e.g., YOLOv8) that draws bounding boxes around corals in a photo, then the 3-class classifier runs on each bounding box. Option B becomes Stage 2 of Option A — no work is thrown away.
+
+### Architecture Decision
+
+The current model is a Keras CNN (224x224 input, sigmoid output, ONNX format). For v2:
+- Same CNN architecture, same 224x224 input
+- Change final layer from sigmoid (1 neuron) to softmax (3 neurons)
+- Update app inference code to read 3 output probabilities instead of 2
+- Retrain with balanced 3-class dataset
+
+### ReefNet Dataset Analysis (Completed)
+
+Analyzed the full ReefNet annotations CSV (5.9M rows) for Caribbean-relevant data:
+
+**Caribbean USVI-genera coral annotations:** 30,438 across 7,745 images
+- Porites: 10,406 | Orbicella: 6,760 | Montastraea: 3,041
+- Agaricia: 2,603 | Siderastrea: 2,449 | Pseudodiploria: 2,443
+- Colpophyllia: 1,428 | Diploria: 318 | Stephanocoenia: 303
+- Acropora: 297 | Eusmilia: 158 | Dendrogyra: 152 | Dichocoenia: 80
+
+**Caribbean non-coral annotations:** 506,926 across 20,253 images
+- Top labels: Turf algae (188K), Sediment (120K), Phaeophyceae (37K), Cyanobacteria (33K), Seagrass (31K), Sponges (18K)
+
+**Key finding:** Caribbean subset has ZERO bleached/dead condition tags. Global ReefNet has 5,330 dead + 3,003 bleached across USVI genera, but UVI team will likely prefer local USVI unhealthy data.
+
+**All 13 USVI genera confirmed present in ReefNet** with species-level labels.
+
+### Data Sourcing Status
+
+| Class | Source | Status |
+|-------|--------|--------|
+| Healthy Coral | Existing 77 images + 3,500 species images + ReefNet Caribbean | Available |
+| Unhealthy Coral | Existing 53 bleached images | Need USVI local data from UVI team |
+| Not Coral | ReefNet Caribbean (595 curated, balanced manifest ready) | **Need alternative image source** |
+
+### CoralNet Image Access — BLOCKER
+
+CoralNet stores images on S3 with randomized filenames (e.g., `iecvainjxc.JPG`) that do not match the original filenames in ReefNet annotations. No public API exists. Direct URL download is not possible. The ReefNet HuggingFace dataset is gated/private (401).
+
+**Alternative image sources to explore for "Not Coral" class:**
+1. NOAA public reef survey imagery (free, no auth)
+2. iNaturalist — Caribbean underwater photos tagged as algae, sponges, seagrass
+3. Background crops from existing coral training images (sand, algae, water visible around coral subjects)
+
+### Scripts Created
+
+Located in `reef-monitor-app/scripts/`:
+- `curate_reefnet_caribbean.py` — Full 3-class curation pipeline (streams 5.9M rows efficiently)
+- `build_not_coral_manifest.py` — Balanced stratified sampler for not-coral class
+- `download_not_coral.py` — Download + crop script (needs working image source)
+- `README.md` — Documents the workflow
+
+### Data Folder Structure
+
+```
+~/Data/coral/
+├── raw/
+│   ├── health-training-data/         # Current binary model data
+│   │   ├── healthy/ (77 images)
+│   │   ├── bleached/ (53 images)
+│   │   └── unknown/ (764 brain coral — unsorted, from species classifier work)
+│   ├── training-data/                # Species classifier data (~3,500 images, 10 species)
+│   └── reefnet_data/                 # ReefNet annotations + metadata (no images)
+└── processed/
+    └── health_model_v2/
+        ├── manifests/                # Curated annotation manifests
+        │   ├── not_coral_manifest.csv (595 balanced samples)
+        │   └── not_coral_sampling_report.txt
+        ├── downloads/images/         # (empty — blocked by CoralNet access)
+        └── training_data/            # Final 224x224 patches for training
+            ├── healthy_coral/
+            ├── unhealthy_coral/
+            └── not_coral/
+```
+
+### Dev Environment
+
+- Python 3.13 via Homebrew
+- Virtual env: `~/venvs/dev/` (activate: `source ~/venvs/dev/bin/activate`)
+- Has: TensorFlow, Keras, PyTorch, Pillow, pandas, numpy, requests, scipy, scikit-learn, Jupyter, tqdm
+- Second venv at `~/projects/options-bot/optiflow-env/` (options bot, separate project)
+- No conda installed
+
+### Git Branches
+
+- `main` — production (deployed to Netlify), has scripts folder + current app
+- `feature/species` — species classifier work (2 commits ahead of main)
+
+---
+
 ## Future Enhancement Ideas
 
 - Real-time bleaching alerts
@@ -244,7 +347,7 @@ appId: "1:930786260606:web:e0f0a3323cb8d2bd724a2f"
 
 ## Important Notes
 
-- Model is BINARY classification (Healthy vs Bleached only)
+- Model is BINARY classification (Healthy vs Bleached only) — v2 will be 3-class
 - All inference happens client-side (privacy + offline)
 - Firebase on Blaze plan (pay-as-you-go, but usage is well within free tier)
 - Custom dive sites are shared community-wide

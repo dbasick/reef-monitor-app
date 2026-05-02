@@ -232,21 +232,21 @@ const BatchScanner = ({
           const results = await model.run(feeds);
           
           const output = results[model.outputNames[0]];
-          
-          // Model outputs single healthy probability, not array of [bleached, healthy]
-          const healthyProb = output.data[0];
-          const bleachedProb = 1 - healthyProb;
-          
-          const isHealthy = healthyProb > 0.5;
-          const prediction = isHealthy ? 'Healthy Coral' : 'Bleached Coral';
-          const confidence = (isHealthy ? healthyProb : bleachedProb) * 100;
-          
+
+          // v3c outputs softmax over [bleached, healthy, non_coral]
+          const probs = Array.from(output.data);
+          const maxIdx = probs.indexOf(Math.max(...probs));
+          const labels = ['Bleached Coral', 'Healthy Coral', 'Not Coral'];
+          const prediction = labels[maxIdx];
+          const confidence = probs[maxIdx] * 100;
+
           resolve({
             prediction: prediction,
             confidence: confidence,
             allPredictions: {
-              'Bleached Coral': bleachedProb * 100,
-              'Healthy Coral': healthyProb * 100
+              'Bleached Coral': probs[0] * 100,
+              'Healthy Coral': probs[1] * 100,
+              'Not Coral': probs[2] * 100
             }
           });
           
@@ -282,13 +282,13 @@ const BatchScanner = ({
 
   // Export CSV
   const exportResults = () => {
-    const csvHeader = 'Filename,Classification,Confidence,Healthy Score,Bleached Score,Status,Action,Timestamp\n';
+    const csvHeader = 'Filename,Classification,Confidence,Healthy Score,Bleached Score,Not Coral Score,Status,Action,Timestamp\n';
     const csvRows = images.map(img => {
       const action = img.reviewQueue ? 'Review Queue' : img.selected ? 'Save' : 'Reject';
       if (img.result) {
-        return `"${img.name}","${img.result.prediction}",${img.result.confidence.toFixed(2)},${img.result.allPredictions['Healthy Coral'].toFixed(2)},${img.result.allPredictions['Bleached Coral'].toFixed(2)},"${img.status}","${action}","${img.processedAt}"`;
+        return `"${img.name}","${img.result.prediction}",${img.result.confidence.toFixed(2)},${img.result.allPredictions['Healthy Coral'].toFixed(2)},${img.result.allPredictions['Bleached Coral'].toFixed(2)},${img.result.allPredictions['Not Coral'].toFixed(2)},"${img.status}","${action}","${img.processedAt}"`;
       } else {
-        return `"${img.name}","N/A","N/A","N/A","N/A","${img.status}","${action}","${img.timestamp}"`;
+        return `"${img.name}","N/A","N/A","N/A","N/A","N/A","${img.status}","${action}","${img.timestamp}"`;
       }
     }).join('\n');
     
@@ -344,11 +344,12 @@ const BatchScanner = ({
     const selected = images.filter(img => img.selected).length;
     const reviewQueue = images.filter(img => img.reviewQueue).length;
     const rejected = images.filter(img => !img.selected && !img.reviewQueue && img.status === 'complete').length;
-    const healthy = images.filter(img => img.result?.prediction.includes('Healthy')).length;
-    const bleached = images.filter(img => img.result?.prediction.includes('Bleached')).length;
+    const healthy = images.filter(img => img.result?.prediction === 'Healthy Coral').length;
+    const bleached = images.filter(img => img.result?.prediction === 'Bleached Coral').length;
+    const notCoral = images.filter(img => img.result?.prediction === 'Not Coral').length;
     const errors = images.filter(img => img.status === 'error').length;
-    
-    return { total, completed, selected, reviewQueue, rejected, healthy, bleached, errors };
+
+    return { total, completed, selected, reviewQueue, rejected, healthy, bleached, notCoral, errors };
   };
 
   const summary = getSummary();
@@ -627,6 +628,10 @@ const BatchScanner = ({
                 <span className="stat-label">Bleached</span>
                 <span className="stat-value">{summary.bleached}</span>
               </div>
+              <div className="stat not-coral">
+                <span className="stat-label">Not Coral</span>
+                <span className="stat-value">{summary.notCoral}</span>
+              </div>
             </div>
 
             <div className="action-summary">
@@ -689,8 +694,14 @@ const BatchScanner = ({
               
               {image.status === 'complete' && image.result && (
                 <>
-                  <div className={`result-badge ${image.result.prediction.includes('Healthy') ? 'healthy' : 'bleached'}`}>
-                    {image.result.prediction.includes('Healthy') ? '🪸 Healthy' : '⚠️ Bleached'}
+                  <div className={`result-badge ${
+                    image.result.prediction === 'Healthy Coral' ? 'healthy' :
+                    image.result.prediction === 'Bleached Coral' ? 'bleached' : 'not-coral'
+                  }`}>
+                    {
+                      image.result.prediction === 'Healthy Coral' ? '🪸 Healthy' :
+                      image.result.prediction === 'Bleached Coral' ? '⚠️ Bleached' : '🚫 Not Coral'
+                    }
                   </div>
                   
                   {image.result.confidence < 60 && (
