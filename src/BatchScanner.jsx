@@ -3,8 +3,9 @@ import { Camera, Upload, X, Check, AlertCircle, Download, Save, Eye } from 'luci
 import * as ort from 'onnxruntime-web';
 import './BatchScanner.css';
 
-const BatchScanner = ({ 
+const BatchScanner = ({
   model,
+  gateModel,
   locationType,
   setLocationType,
   selectedSite,
@@ -157,7 +158,7 @@ const BatchScanner = ({
 
   // Process batch
   const processBatch = async () => {
-    if (!model || images.length === 0) return;
+    if (!model || !gateModel || images.length === 0) return;
 
     setProcessing(true);
     setStep('results');
@@ -227,26 +228,40 @@ const BatchScanner = ({
           }
           
           const tensor = new ort.Tensor('float32', float32Data, [1, 224, 224, 3]);
-          const feeds = {};
-          feeds[model.inputNames[0]] = tensor;
-          const results = await model.run(feeds);
-          
-          const output = results[model.outputNames[0]];
 
-          // v3c outputs softmax over [bleached, healthy, non_coral]
-          const probs = Array.from(output.data);
-          const maxIdx = probs.indexOf(Math.max(...probs));
-          const labels = ['Bleached Coral', 'Healthy Coral', 'Not Coral'];
-          const prediction = labels[maxIdx];
-          const confidence = probs[maxIdx] * 100;
+          // Step 1: gate decides "is this a coral image at all?"
+          const gateOut = (await gateModel.run({ [gateModel.inputNames[0]]: tensor }))[gateModel.outputNames[0]];
+          const notCoralProb = gateOut.data[1];   // gate softmax: [coral, not_coral]
+
+          if (notCoralProb > 0.5) {
+            // Gate rejected — skip health classifier
+            resolve({
+              prediction: 'Not Coral',
+              confidence: notCoralProb * 100,
+              allPredictions: {
+                'Bleached Coral': 0,
+                'Healthy Coral': 0,
+                'Not Coral': notCoralProb * 100
+              }
+            });
+            return;
+          }
+
+          // Step 2: gate passed — run v2 binary for healthy/bleached
+          const healthOut = (await model.run({ [model.inputNames[0]]: tensor }))[model.outputNames[0]];
+          const healthyProb  = healthOut.data[0];
+          const bleachedProb = 1 - healthyProb;
+          const isHealthy = healthyProb > 0.5;
+          const prediction = isHealthy ? 'Healthy Coral' : 'Bleached Coral';
+          const confidence = (isHealthy ? healthyProb : bleachedProb) * 100;
 
           resolve({
             prediction: prediction,
             confidence: confidence,
             allPredictions: {
-              'Bleached Coral': probs[0] * 100,
-              'Healthy Coral': probs[1] * 100,
-              'Not Coral': probs[2] * 100
+              'Bleached Coral': bleachedProb * 100,
+              'Healthy Coral': healthyProb * 100,
+              'Not Coral': notCoralProb * 100
             }
           });
           

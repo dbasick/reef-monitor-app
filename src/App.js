@@ -20,7 +20,8 @@ import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 const CLASS_LABELS = ['Bleached Coral', 'Healthy Coral', 'Not Coral'];
 
 function App() {
-  const [model, setModel] = useState(null);
+  const [model, setModel] = useState(null);          // v2 binary health classifier (healthy/bleached)
+  const [gateModel, setGateModel] = useState(null);  // coral / not_coral gate
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
@@ -81,15 +82,18 @@ function App() {
   const loadModel = async () => {
     try {
       setLoading(true);
-      setError(null); // Clear any previous errors
-      const session = await ort.InferenceSession.create(process.env.PUBLIC_URL + '/coral_model.onnx', {
-        executionProviders: ['wasm'],
-      });
-      setModel(session);
+      setError(null);
+      // Load gate (coral/not_coral) and v2 health (binary bleached/healthy) in parallel
+      const [gateSession, healthSession] = await Promise.all([
+        ort.InferenceSession.create(process.env.PUBLIC_URL + '/coral_gate.onnx',  { executionProviders: ['wasm'] }),
+        ort.InferenceSession.create(process.env.PUBLIC_URL + '/coral_model.onnx', { executionProviders: ['wasm'] }),
+      ]);
+      setGateModel(gateSession);
+      setModel(healthSession);
       setLoading(false);
     } catch (err) {
-      console.error('Error loading model:', err);
-      setError('Failed to load AI model. Please refresh the page.');
+      console.error('Error loading models:', err);
+      setError('Failed to load AI models. Please refresh the page.');
       setLoading(false);
     }
   };
@@ -222,8 +226,8 @@ function App() {
   };
 
   const analyzeImage = async (imageUrl, imageFile) => {
-    // FIX #1: Check if model is loaded but don't show error yet - just wait
-    if (!model) {
+    // FIX #1: Check if both models are loaded but don't show error yet - just wait
+    if (!model || !gateModel) {
       if (loading) {
         // Model is still loading, wait a bit and retry
         setTimeout(() => analyzeImage(imageUrl, imageFile), 500);
@@ -251,27 +255,46 @@ function App() {
 
       const tensorData = await preprocessImage(img);
       const tensor = new ort.Tensor('float32', tensorData, [1, 224, 224, 3]);
-      
-      const inputName = model.inputNames[0];
-      const feeds = { [inputName]: tensor };
-      const results = await model.run(feeds);
-      
-      const output = results[Object.keys(results)[0]];
-      // v3c outputs softmax over [bleached, healthy, non_coral]
-      const probs = Array.from(output.data);
-      const maxIdx = probs.indexOf(Math.max(...probs));
-      const prediction = CLASS_LABELS[maxIdx];
-      const confidence = probs[maxIdx] * 100;
 
-      const resultData = {
-        prediction: prediction,
-        confidence: confidence.toFixed(1),
-        allPredictions: CLASS_LABELS.map((label, i) => ({
-          label: label,
-          confidence: (probs[i] * 100).toFixed(1)
-        })),
-        imageUrl
-      };
+      // Step 1: gate decides "is this a coral image at all?"
+      const gateOut = (await gateModel.run({ [gateModel.inputNames[0]]: tensor }))[gateModel.outputNames[0]];
+      // gate softmax: [coral_prob, not_coral_prob]
+      const notCoralProb = gateOut.data[1];
+
+      let resultData;
+      if (notCoralProb > 0.5) {
+        // Gate rejected — skip the health classifier entirely
+        resultData = {
+          prediction: 'Not Coral',
+          confidence: (notCoralProb * 100).toFixed(1),
+          allPredictions: [
+            { label: 'Bleached Coral', confidence: '0.0' },
+            { label: 'Healthy Coral',  confidence: '0.0' },
+            { label: 'Not Coral',      confidence: (notCoralProb * 100).toFixed(1) },
+          ],
+          imageUrl
+        };
+      } else {
+        // Step 2: gate passed — run v2 binary for healthy/bleached
+        const healthOut = (await model.run({ [model.inputNames[0]]: tensor }))[model.outputNames[0]];
+        // v2 outputs single sigmoid: data[0] = healthy probability
+        const healthyProb  = healthOut.data[0];
+        const bleachedProb = 1 - healthyProb;
+        const isHealthy = healthyProb > 0.5;
+        const prediction = isHealthy ? 'Healthy Coral' : 'Bleached Coral';
+        const confidence = (isHealthy ? healthyProb : bleachedProb) * 100;
+
+        resultData = {
+          prediction: prediction,
+          confidence: confidence.toFixed(1),
+          allPredictions: [
+            { label: 'Bleached Coral', confidence: (bleachedProb * 100).toFixed(1) },
+            { label: 'Healthy Coral',  confidence: (healthyProb  * 100).toFixed(1) },
+            { label: 'Not Coral',      confidence: (notCoralProb * 100).toFixed(1) },
+          ],
+          imageUrl
+        };
+      }
       
       setResult(resultData);
       setAnalyzing(false);
@@ -741,8 +764,9 @@ function App() {
 
       {/* Batch Scanner Mode */}
       {!showHistory && !showMap && viewMode === 'batch' && (
-        <BatchScanner 
+        <BatchScanner
           model={model}
+          gateModel={gateModel}
           locationType={locationType}
           setLocationType={setLocationType}
           selectedSite={selectedSite}
